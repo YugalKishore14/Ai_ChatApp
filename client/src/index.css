@@ -772,6 +772,7 @@ code {
   width: 2.5rem;
   height: 2.5rem;
   justify-content: center;
+  font-size: 1rem; /* Ensure icon is visible */
 }
 
 .logout-btn:hover {
@@ -1082,6 +1083,10 @@ code {
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-bottom-left-radius: 0.5rem;
   backdrop-filter: blur(10px);
+  /* Ensure proper spacing and typography for markdown content */
+  line-height: 1.6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .cursor-blink {
@@ -1234,40 +1239,47 @@ code {
   color: white;
   font-weight: 700;
   letter-spacing: -0.02em;
+  margin-bottom: 0;
 }
 
 .admin-header .user-info {
   display: flex;
   align-items: center;
   background: rgba(255, 255, 255, 0.1);
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
   border-radius: var(--border-radius);
   backdrop-filter: blur(10px);
+  min-height: 60px;
 }
 
 .admin-header .user-avatar {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 1.1rem;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: white;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
 }
 
 .admin-header .user-name {
   font-weight: 600;
   color: white;
-  margin-bottom: 0;
-  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  line-height: 1.2;
 }
 
 .admin-header .user-role {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 0;
+  line-height: 1.2;
 }
 
 .admin-header .modern-btn {
@@ -1276,6 +1288,8 @@ code {
   color: white;
   backdrop-filter: blur(10px);
   transition: var(--transition);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
 }
 
 .admin-header .modern-btn:hover {
@@ -1283,6 +1297,36 @@ code {
   border-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-2px);
   color: white;
+}
+
+.admin-header .logout-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  backdrop-filter: blur(10px);
+  transition: var(--transition);
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.admin-header .logout-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Ensure proper alignment in admin header */
+.admin-header .d-flex.align-items-center.gap-3 {
+  gap: 1rem !important;
+  height: 60px;
+  align-items: center;
 }
 
 /* Enhanced Table Styles */
@@ -1492,6 +1536,7 @@ code {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  padding: 0;
 }
 
 /* Fix for empty chat positioning */
@@ -1509,4 +1554,332 @@ code {
 /* Prevent body scrolling when chat is active */
 body.chat-active {
   overflow: hidden;
+}
+
+/* Better message spacing */
+.message-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+.message-wrapper:last-child {
+  margin-bottom: 2rem; /* Extra space before input */
+}
+
+/* Improve message bubble sizing */
+.message-bubble {
+  width: fit-content;
+  min-width: 50px;
+  max-width: calc(100% - 1rem);
+}
+
+.message-content {
+  width: 100%;
+}
+
+/* Dashboard Header Improvements */
+.dashboard-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  color: white;
+  box-shadow: var(--box-shadow-lg);
+}
+
+.dashboard-header .user-info {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+  backdrop-filter: blur(10px);
+  min-height: 60px; /* Ensure consistent height */
+}
+
+.dashboard-header .user-avatar {
+  width: 45px;
+  height: 45px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: white;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.dashboard-header .user-name {
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.dashboard-header .user-role {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0;
+  line-height: 1.2;
+}
+
+.dashboard-header .logout-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  backdrop-filter: blur(10px);
+  transition: var(--transition);
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.dashboard-header .logout-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Ensure proper alignment in dashboard header */
+.dashboard-header .d-flex.align-items-center.gap-3 {
+  gap: 1rem !important;
+  height: 60px;
+  align-items: center;
+}
+
+/* Markdown Rendering Styles for AI Messages */
+.message-bubble.assistant {
+  /* Ensure proper spacing and typography for markdown content */
+  line-height: 1.6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Reset default margins for first and last elements */
+.message-bubble.assistant > div > *:first-child {
+  margin-top: 0 !important;
+}
+
+.message-bubble.assistant > div > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Markdown Content Specific Styles */
+.message-bubble.assistant p {
+  margin: 0.75rem 0;
+  line-height: 1.6;
+  color: inherit;
+}
+
+.message-bubble.assistant h1,
+.message-bubble.assistant h2,
+.message-bubble.assistant h3,
+.message-bubble.assistant h4,
+.message-bubble.assistant h5,
+.message-bubble.assistant h6 {
+  color: inherit;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.message-bubble.assistant h1 {
+  font-size: 1.4rem;
+  margin: 1.5rem 0 0.75rem 0;
+  border-bottom: 2px solid rgba(99, 102, 241, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.message-bubble.assistant h2 {
+  font-size: 1.2rem;
+  margin: 1.25rem 0 0.5rem 0;
+}
+
+.message-bubble.assistant h3 {
+  font-size: 1.1rem;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.message-bubble.assistant ul,
+.message-bubble.assistant ol {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.message-bubble.assistant li {
+  margin: 0.25rem 0;
+  line-height: 1.6;
+}
+
+.message-bubble.assistant ul li {
+  list-style-type: disc;
+}
+
+.message-bubble.assistant ol li {
+  list-style-type: decimal;
+}
+
+.message-bubble.assistant blockquote {
+  border-left: 4px solid #6366f1;
+  background: rgba(99, 102, 241, 0.1);
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+}
+
+.message-bubble.assistant blockquote p {
+  margin: 0.25rem 0;
+}
+
+.message-bubble.assistant code:not(.hljs) {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: inherit;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.message-bubble.assistant pre {
+  margin: 1rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.message-bubble.assistant pre code {
+  background: none !important;
+  padding: 0 !important;
+  border: none !important;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.message-bubble.assistant table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.message-bubble.assistant th {
+  background: rgba(99, 102, 241, 0.1);
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #6366f1;
+  color: inherit;
+}
+
+.message-bubble.assistant td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  color: inherit;
+}
+
+.message-bubble.assistant tbody tr:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.message-bubble.assistant a {
+  color: #6366f1;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.message-bubble.assistant a:hover {
+  color: #818cf8;
+  text-decoration: none;
+}
+
+.message-bubble.assistant strong {
+  font-weight: 600;
+  color: inherit;
+}
+
+.message-bubble.assistant em {
+  font-style: italic;
+  color: inherit;
+}
+
+.message-bubble.assistant hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #6366f1, transparent);
+  margin: 1.5rem 0;
+  border-radius: 1px;
+}
+
+/* Code block scrolling */
+.message-bubble.assistant pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.message-bubble.assistant pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+.message-bubble.assistant pre::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.message-bubble.assistant pre::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.message-bubble.assistant pre::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Table responsiveness */
+.message-bubble.assistant table {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.message-bubble.assistant table thead,
+.message-bubble.assistant table tbody,
+.message-bubble.assistant table th,
+.message-bubble.assistant table td,
+.message-bubble.assistant table tr {
+  display: table-cell;
+}
+
+@media (max-width: 768px) {
+  .message-bubble.assistant {
+    font-size: 0.875rem;
+  }
+  
+  .message-bubble.assistant h1 {
+    font-size: 1.25rem;
+  }
+  
+  .message-bubble.assistant h2 {
+    font-size: 1.125rem;
+  }
+  
+  .message-bubble.assistant h3 {
+    font-size: 1rem;
+  }
+  
+  .message-bubble.assistant code:not(.hljs) {
+    font-size: 0.8rem;
+  }
+  
+  .message-bubble.assistant pre code {
+    font-size: 0.8rem;
+  }
 }

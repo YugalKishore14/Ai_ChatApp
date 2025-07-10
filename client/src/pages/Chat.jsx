@@ -4,6 +4,7 @@ import { FaRobot, FaUser, FaPaperPlane, FaSignOutAlt, FaCog, FaTrash, FaPlus, Fa
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { chatAPI } from '../services/api';
+import MarkdownRenderer from '../components/MarkdownRenderer';
 
 const Chat = () => {
   const { user, logout, isAdmin } = useAuth();
@@ -320,7 +321,11 @@ const Chat = () => {
                         </span>
                       </div>
                       <div className={`message-bubble ${message.role}`}>
-                        {message.content}
+                        {message.role === 'assistant' ? (
+                          <MarkdownRenderer content={message.content} />
+                        ) : (
+                          message.content
+                        )}
                         {message.isStreaming && (
                           <span className="cursor-blink">|</span>
                         )}

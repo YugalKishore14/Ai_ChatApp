@@ -265,7 +265,7 @@ const AdminPanel = () => {
                 </div>
                 <div className="ms-3">
                   <h4 className="mb-0 brand-text">Admin Panel</h4>
-                  <small className="text-muted">System Management</small>
+                  <small style={{color: 'rgba(255, 255, 255, 0.8)'}}>System Management</small>
                 </div>
               </div>
             </Col>
@@ -275,7 +275,7 @@ const AdminPanel = () => {
                   <div className="user-avatar">
                     {user?.name?.charAt(0).toUpperCase()}
                   </div>
-                  <div className="ms-3">
+                  <div>
                     <div className="user-name">{user?.name}</div>
                     <div className="user-role">Administrator</div>
                   </div>
@@ -290,8 +290,9 @@ const AdminPanel = () => {
                 </Button>
                 <Button 
                   variant="outline-secondary" 
-                  className="modern-btn logout-btn"
+                  className="logout-btn"
                   onClick={handleLogout}
+                  title="Logout"
                 >
                   <FaArrowLeft />
                 </Button>

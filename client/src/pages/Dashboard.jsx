@@ -26,7 +26,7 @@ const Dashboard = () => {
                 </div>
                 <div className="ms-3">
                   <h4 className="mb-0 brand-text">YUG-AI</h4>
-                  <small className="text-muted">Powered by YUG-AI Technology</small>
+                  <small style={{color: 'rgba(255, 255, 255, 0.8)'}}>Powered by YUG-AI Technology</small>
                 </div>
               </div>
             </Col>
@@ -36,15 +36,16 @@ const Dashboard = () => {
                   <div className="user-avatar">
                     {user?.name?.charAt(0).toUpperCase()}
                   </div>
-                  <div className="ms-3">
+                  <div>
                     <div className="user-name">{user?.name}</div>
                     <div className="user-role">{user?.role === 'admin' ? 'Administrator' : 'User'}</div>
                   </div>
                 </div>
                 <Button 
                   variant="outline-secondary" 
-                  className="modern-btn logout-btn"
+                  className="logout-btn"
                   onClick={handleLogout}
+                  title="Logout"
                 >
                   <FaSignOutAlt />
                 </Button>
@@ -79,7 +80,7 @@ const Dashboard = () => {
                 <p className="feature-description">
                   Engage in intelligent conversations with our advanced YUG-AI
                 </p>
-                <Button className="modern-btn primary-btn w-100">
+                <Button className="modern-btn primary-btn w-100" onClick={(e) => { e.stopPropagation(); navigate('/chat'); }}>
                   Begin Conversation
                 </Button>
               </Card.Body>
