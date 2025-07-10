@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
-import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaRobot } from 'react-icons/fa';
-import { toast } from 'react-toastify';
+import { Container, Row, Col, Card, Form, Button, InputGroup, Spinner, Alert } from 'react-bootstrap';
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaRobot, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { authAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -19,6 +18,13 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [notification, setNotification] = useState(null);
+
+  // Custom notification function
+  const showNotification = (message, type = 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -82,27 +88,52 @@ const Signup = () => {
       });
 
       if (response.needsApproval) {
-        toast.success('Account created successfully! Please wait for admin approval before logging in.');
-        navigate('/login', { 
-          state: { 
-            message: 'Account created! Please wait for admin approval before logging in.',
-            email: response.email
-          }
-        });
+        showNotification('Account created successfully! Please wait for admin approval before logging in.', 'success');
+        setTimeout(() => {
+          navigate('/login', { 
+            state: { 
+              message: 'Account created! Please wait for admin approval before logging in.',
+              email: response.email
+            }
+          });
+        }, 2000);
       } else {
-        toast.success('Account created successfully!');
-        login(response.token, response.user);
-        navigate('/chat');
+        showNotification('Account created successfully!', 'success');
+        setTimeout(() => {
+          login(response.token, response.user);
+          navigate('/dashboard');
+        }, 1500);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to create account');
+      showNotification(error.response?.data?.message || 'Failed to create account', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Container fluid className="min-vh-100 bg-light d-flex align-items-center">
+    <>
+      {/* Custom Notification */}
+      {notification && (
+        <div className={`custom-notification custom-notification-${notification.type}`}>
+          <div className="d-flex align-items-center">
+            {notification.type === 'success' ? (
+              <FaCheckCircle className="me-2" />
+            ) : (
+              <FaExclamationTriangle className="me-2" />
+            )}
+            <span>{notification.message}</span>
+          </div>
+          <button 
+            className="notification-close"
+            onClick={() => setNotification(null)}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      <Container fluid className="min-vh-100 bg-light d-flex align-items-center">
       <Row className="w-100 justify-content-center">
         <Col md={6} lg={5} xl={4}>
           <Card className="shadow-lg border-0">
@@ -246,6 +277,7 @@ const Signup = () => {
         </Col>
       </Row>
     </Container>
+    </>
   );
 };
 

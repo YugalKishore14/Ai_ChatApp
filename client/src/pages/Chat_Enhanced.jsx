@@ -22,25 +22,11 @@ const Chat = () => {
   useEffect(() => {
     loadChatHistory();
     inputRef.current?.focus();
-    
-    // Add chat-active class to body to prevent scrolling
-    document.body.classList.add('chat-active');
-    
-    // Cleanup function to remove class when component unmounts
-    return () => {
-      document.body.classList.remove('chat-active');
-    };
   }, []);
 
-  // Only scroll when a new message is added, not on every update
   useEffect(() => {
-    if (messages.length > 0) {
-      // Small delay to ensure DOM is updated
-      setTimeout(() => {
-        scrollToBottom();
-      }, 100);
-    }
-  }, [messages.length]);
+    scrollToBottom();
+  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -68,16 +54,12 @@ const Chat = () => {
   const startNewChat = () => {
     setMessages([]);
     setCurrentSessionId(null);
-    setIsTyping(false);
-    setLoading(false);
     inputRef.current?.focus();
   };
 
   const loadChatSession = (session) => {
     setMessages(session.messages || []);
     setCurrentSessionId(session._id);
-    setIsTyping(false);
-    setLoading(false);
   };
 
   const deleteChatSession = async (sessionId, e) => {
@@ -106,7 +88,7 @@ const Chat = () => {
         wordIndex++;
       } else {
         clearInterval(interval);
-        setLoading(false); // Reset loading when done
+        setIsTyping(false);
       }
     }, 80);
   };
@@ -124,8 +106,9 @@ const Chat = () => {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setLoading(true);
+    setIsTyping(true);
 
-    // Add an empty AI message that will be filled gradually
+    // Add a placeholder AI message that will be updated
     const aiMessagePlaceholder = {
       role: 'assistant',
       content: '',
@@ -141,17 +124,15 @@ const Chat = () => {
         setCurrentSessionId(response.sessionId);
         loadChatHistory();
 
-        // Simulate streaming for the AI response without typing indicator
+        // Simulate streaming for the AI response
         simulateStreaming(response.aiMessage, (streamedText) => {
           setMessages(prev => prev.map((msg, index) => 
-            index === prev.length - 1 ? { ...msg, content: streamedText, isStreaming: streamedText !== response.aiMessage } : msg
+            index === prev.length - 1 ? { ...msg, content: streamedText } : msg
           ));
         });
-      } else {
-        setMessages(prev => prev.slice(0, -1));
-        showNotification('Failed to get AI response', 'error');
       }
     } catch (error) {
+      setIsTyping(false);
       setMessages(prev => prev.slice(0, -1)); // Remove placeholder
       showNotification('Failed to send message. Please try again.', 'error');
     } finally {
@@ -327,7 +308,27 @@ const Chat = () => {
                       </div>
                     </div>
                   </div>
-                )                )}
+                ))}
+                
+                {isTyping && (
+                  <div className="message-wrapper assistant">
+                    <div className="message-avatar">
+                      <div className="ai-avatar">
+                        <FaBrain />
+                      </div>
+                    </div>
+                    <div className="message-content">
+                      <div className="typing-indicator">
+                        <div className="typing-dots">
+                          <div className="typing-dot"></div>
+                          <div className="typing-dot"></div>
+                          <div className="typing-dot"></div>
+                        </div>
+                        <span>AI is thinking...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
               </div>
             )}

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Row, Col, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaRobot } from 'react-icons/fa';
-import { toast } from 'react-toastify';
 import { authAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -18,6 +17,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [statusMessage, setStatusMessage] = useState(location.state?.message || null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     if (location.state?.message) {
@@ -73,16 +73,15 @@ const Login = () => {
         password: formData.password
       });
 
-      toast.success('Welcome back!');
       login(response.token, response.user);
-      navigate('/chat');
+      navigate('/dashboard');
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to sign in';
       
       if (error.response?.data?.needsApproval) {
         setStatusMessage('Your account is pending admin approval. Please wait for approval before logging in.');
       } else {
-        toast.error(errorMessage);
+        setErrorMessage(errorMessage);
       }
     } finally {
       setLoading(false);
@@ -108,6 +107,13 @@ const Login = () => {
                 <Alert variant="info" className="mb-4">
                   <i className="fas fa-info-circle me-2"></i>
                   {statusMessage}
+                </Alert>
+              )}
+
+              {errorMessage && (
+                <Alert variant="danger" className="mb-4">
+                  <i className="fas fa-exclamation-triangle me-2"></i>
+                  {errorMessage}
                 </Alert>
               )}
 

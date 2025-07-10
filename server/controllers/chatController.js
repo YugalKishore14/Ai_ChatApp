@@ -81,7 +81,7 @@ exports.sendMessage = async (req, res) => {
             } else {
                 console.log('Mistral API key not configured or invalid');
                 // Fallback response when no API key is provided
-                aiResponse = `Thank you for your message: "${message}". I'm a demo AI assistant. To get real AI responses, please configure your Mistral API key in the server environment variables.`;
+                aiResponse = `Thank you for your message: "${message}". I'm a demo YUG-AI. To get real AI responses, please configure your Mistral API key in the server environment variables.`;
             }
         } catch (apiError) {
             console.error('Mistral API Error:', apiError.response?.data || apiError.message);

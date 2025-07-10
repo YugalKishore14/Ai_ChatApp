@@ -2,21 +2,28 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import Dashboard from './pages/Dashboard';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import Chat from './pages/Chat';
 import AdminPanel from './pages/AdminPanel';
-import { Spinner } from 'react-bootstrap';
+import { FaBrain } from 'react-icons/fa';
 
 function App() {
   const { loading, isAuthenticated } = useAuth();
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center vh-100">
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
+      <div style={{ 
+        height: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: '#6366f1',
+        color: 'white',
+        fontSize: '2rem'
+      }}>
+        Loading YUG-AI Assistant...
       </div>
     );
   }
@@ -27,15 +34,23 @@ function App() {
         path="/" 
         element={
           isAuthenticated() ? 
-          <Navigate to="/chat" replace /> : 
+          <Navigate to="/dashboard" replace /> : 
           <Navigate to="/login" replace />
+        } 
+      />
+      <Route 
+        path="/dashboard" 
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
         } 
       />
       <Route 
         path="/signup" 
         element={
           isAuthenticated() ? 
-          <Navigate to="/chat" replace /> : 
+          <Navigate to="/dashboard" replace /> : 
           <Signup />
         } 
       />
@@ -43,7 +58,7 @@ function App() {
         path="/login" 
         element={
           isAuthenticated() ? 
-          <Navigate to="/chat" replace /> : 
+          <Navigate to="/dashboard" replace /> : 
           <Login />
         } 
       />

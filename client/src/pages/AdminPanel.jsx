@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Button, Modal, Form, Badge, Tabs, Tab, Alert, Spinner } from 'react-bootstrap';
-import { FaUsers, FaComments, FaDownload, FaTrash, FaEdit, FaEye, FaUserShield, FaArrowLeft } from 'react-icons/fa';
+import { FaUsers, FaComments, FaDownload, FaTrash, FaEdit, FaEye, FaUserShield, FaArrowLeft, FaCheckCircle, FaExclamationTriangle, FaBrain, FaHome } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../services/api';
-import { toast } from 'react-toastify';
+import { useAuth } from '../context/AuthContext';
 
 const AdminPanel = () => {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [users, setUsers] = useState([]);
   const [pendingUsers, setPendingUsers] = useState([]);
   const [chatHistory, setChatHistory] = useState([]);
@@ -16,6 +17,18 @@ const AdminPanel = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedChat, setSelectedChat] = useState(null);
   const [activeTab, setActiveTab] = useState('pending');
+  const [notification, setNotification] = useState(null);
+
+  // Custom notification function
+  const showNotification = (message, type = 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   useEffect(() => {
     loadData();
@@ -33,7 +46,7 @@ const AdminPanel = () => {
       setPendingUsers(pendingResponse.users || []);
       setChatHistory(chatResponse.chats || []);
     } catch (error) {
-      toast.error('Failed to load admin data');
+      showNotification('Failed to load admin data', 'error');
     } finally {
       setLoading(false);
     }
@@ -45,9 +58,9 @@ const AdminPanel = () => {
     try {
       await adminAPI.deleteUser(userId);
       setUsers(prev => prev.filter(user => user._id !== userId));
-      toast.success('User deleted successfully');
+      showNotification('User deleted successfully', 'success');
     } catch (error) {
-      toast.error('Failed to delete user');
+      showNotification('Failed to delete user', 'error');
     }
   };
 
@@ -71,9 +84,9 @@ const AdminPanel = () => {
       setPendingUsers(prev => prev.filter(user => user._id !== userId));
       // Refresh the approved users list
       loadData();
-      toast.success('User approved successfully');
+      showNotification('User approved successfully', 'success');
     } catch (error) {
-      toast.error('Failed to approve user');
+      showNotification('Failed to approve user', 'error');
     }
   };
 
@@ -83,9 +96,9 @@ const AdminPanel = () => {
     try {
       await adminAPI.rejectUser(userId);
       setPendingUsers(prev => prev.filter(user => user._id !== userId));
-      toast.success('User registration rejected');
+      showNotification('User registration rejected', 'success');
     } catch (error) {
-      toast.error('Failed to reject user');
+      showNotification('Failed to reject user', 'error');
     }
   };
 
@@ -100,9 +113,9 @@ const AdminPanel = () => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      toast.success('Chat data exported successfully');
+      showNotification('Chat data exported successfully', 'success');
     } catch (error) {
-      toast.error('Failed to export chat data');
+      showNotification('Failed to export chat data', 'error');
     }
   };
 
@@ -220,7 +233,75 @@ const AdminPanel = () => {
   }
 
   return (
-    <Container fluid className="py-4">
+    <>
+      {/* Custom Notification */}
+      {notification && (
+        <div className={`custom-notification custom-notification-${notification.type}`}>
+          <div className="d-flex align-items-center">
+            {notification.type === 'success' ? (
+              <FaCheckCircle className="me-2" />
+            ) : (
+              <FaExclamationTriangle className="me-2" />
+            )}
+            <span>{notification.message}</span>
+          </div>
+          <button 
+            className="notification-close"
+            onClick={() => setNotification(null)}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* Modern Header */}
+      <header className="admin-header">
+        <Container fluid>
+          <Row className="align-items-center py-3">
+            <Col>
+              <div className="d-flex align-items-center">
+                <div className="logo-container">
+                  <FaBrain className="logo-icon" />
+                </div>
+                <div className="ms-3">
+                  <h4 className="mb-0 brand-text">Admin Panel</h4>
+                  <small className="text-muted">System Management</small>
+                </div>
+              </div>
+            </Col>
+            <Col xs="auto">
+              <div className="d-flex align-items-center gap-3">
+                <div className="user-info">
+                  <div className="user-avatar">
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="ms-3">
+                    <div className="user-name">{user?.name}</div>
+                    <div className="user-role">Administrator</div>
+                  </div>
+                </div>
+                <Button 
+                  variant="outline-primary" 
+                  className="modern-btn"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  <FaHome className="me-2" />
+                  Dashboard
+                </Button>
+                <Button 
+                  variant="outline-secondary" 
+                  className="modern-btn logout-btn"
+                  onClick={handleLogout}
+                >
+                  <FaArrowLeft />
+                </Button>
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </header>
+
+      <Container fluid className="py-4">
       <Row className="mb-4">
         <Col>
           <div className="d-flex justify-content-between align-items-center">
@@ -445,6 +526,7 @@ const AdminPanel = () => {
       <UserModal />
       <ChatModal />
     </Container>
+    </>
   );
 };
 

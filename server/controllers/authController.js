@@ -6,15 +6,22 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your_refresh_secret';
 
 // Generate tokens
-const generateTokens = (userId) => {
+const generateTokens = (user) => {
+    const payload = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+    };
+    
     const accessToken = jwt.sign(
-        { id: userId },
+        payload,
         JWT_SECRET,
         { expiresIn: '15m' }
     );
     
     const refreshToken = jwt.sign(
-        { id: userId },
+        { id: user._id },
         JWT_REFRESH_SECRET,
         { expiresIn: '7d' }
     );
@@ -120,7 +127,7 @@ exports.login = async (req, res) => {
         }
 
         // Generate tokens
-        const { accessToken, refreshToken } = generateTokens(user._id);
+        const { accessToken, refreshToken } = generateTokens(user);
 
         // Save refresh token to user
         user.refreshTokens.push({ token: refreshToken });
@@ -173,7 +180,7 @@ exports.refreshToken = async (req, res) => {
         }
 
         // Generate new tokens
-        const { accessToken, refreshToken: newRefreshToken } = generateTokens(user._id);
+        const { accessToken, refreshToken: newRefreshToken } = generateTokens(user);
 
         // Replace old refresh token with new one
         user.refreshTokens = user.refreshTokens.filter(t => t.token !== refreshToken);
