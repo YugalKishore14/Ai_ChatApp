@@ -1,38 +1,43 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const User = require('../models/User');
+const { 
+    register, 
+    login, 
+    refreshToken, 
+    logout, 
+    getProfile 
+} = require('../controllers/authController');
+const { verifyToken } = require('../middlewares/verifyToken');
+const { 
+    validateRegister, 
+    validateLogin, 
+    validateRefreshToken 
+} = require('../middlewares/validation');
 
 const router = express.Router();
 
-// Signup
-router.post('/signup', async (req, res) => {
-    const { username, email, password } = req.body;
-    try {
-        const hashed = await bcrypt.hash(password, 10);
-        const user = await User.create({ username, email, password: hashed });
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-        res.json({ token });
-    } catch (err) {
-        res.status(500).json({ message: 'Signup failed' });
-    }
-});
+// @route   POST /api/auth/register
+// @desc    Register a new user
+// @access  Public
+router.post('/register', validateRegister, register);
 
-// Login
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ message: 'User not found' });
+// @route   POST /api/auth/login
+// @desc    Login user
+// @access  Public
+router.post('/login', validateLogin, login);
 
-        const valid = await bcrypt.compare(password, user.password);
-        if (!valid) return res.status(400).json({ message: 'Invalid password' });
+// @route   POST /api/auth/refresh
+// @desc    Refresh access token
+// @access  Public
+router.post('/refresh', validateRefreshToken, refreshToken);
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-        res.json({ token });
-    } catch (err) {
-        res.status(500).json({ message: 'Login failed' });
-    }
-});
+// @route   POST /api/auth/logout
+// @desc    Logout user
+// @access  Private
+router.post('/logout', verifyToken, logout);
+
+// @route   GET /api/auth/profile
+// @desc    Get user profile
+// @access  Private
+router.get('/profile', verifyToken, getProfile);
 
 module.exports = router;

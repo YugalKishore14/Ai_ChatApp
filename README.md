@@ -17,4 +17,4 @@ This project is organized into two main folders:
 - `models/` - Mongoose models
 - `middlewares/` - Express middleware functions
 - `app.js` - Express app entry point
-- `config/` - (Optional) For DB and other configs 
+- `config/` - (Optional) For DB and other configs

@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Development",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-Command",
+				"Start-Process powershell -ArgumentList '-NoExit', '-Command', 'cd \"${workspaceFolder}\\server\"; npm run yugal'; Start-Process powershell -ArgumentList '-NoExit', '-Command', 'cd \"${workspaceFolder}\\client\"; npm run dev'"
+			],
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
