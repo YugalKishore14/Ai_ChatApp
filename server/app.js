@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
@@ -43,6 +44,14 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
+// Serve React app for all non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -50,11 +59,6 @@ app.use((err, req, res, next) => {
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
   });
-});
-
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
 });
 
 // MongoDB Connect

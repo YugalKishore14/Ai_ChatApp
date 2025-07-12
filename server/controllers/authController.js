@@ -44,9 +44,23 @@ exports.register = async (req, res) => {
         // Check validation errors
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            // Get specific error messages
+            const errorMessages = errors.array().map(error => {
+                switch (error.path) {
+                    case 'name':
+                        return 'Name must be at least 2 characters long';
+                    case 'email':
+                        return 'Please provide a valid email address';
+                    case 'password':
+                        return 'Password must be at least 6 characters long';
+                    default:
+                        return error.msg;
+                }
+            });
+            
             return res.status(400).json({
-                message: 'Validation failed',
-                errors: errors.array()
+                message: errorMessages[0], // Show first error message
+                errors: errorMessages
             });
         }
 
