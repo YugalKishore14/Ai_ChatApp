@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/', // Use relative paths
+  base: 'http://34.42.233.32:5000/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
