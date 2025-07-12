@@ -14,8 +14,12 @@ const adminRoutes = require('./routes/admin');
 dotenv.config();
 const app = express();
 
-// Security middleware
-app.use(helmet());
+// Security middleware - Update helmet configuration for deployment
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable CSP for now to avoid conflicts
+  crossOriginOpenerPolicy: false, // Disable COOP header causing the warning
+  crossOriginResourcePolicy: { policy: "cross-origin" } // Allow cross-origin resources
+}));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -25,14 +29,25 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// CORS configuration
+// CORS configuration - Update for production
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: [
+    process.env.CLIENT_URL || 'http://localhost:5173',
+    'http://34.42.233.32:5000',
+    'https://34.42.233.32:5000'
+  ],
   credentials: true
 }));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Add middleware to handle mixed content
+app.use((req, res, next) => {
+  // Allow mixed content for deployment
+  res.setHeader('Content-Security-Policy', "upgrade-insecure-requests");
+  next();
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -45,7 +60,17 @@ app.get('/api/health', (req, res) => {
 });
 
 // Serve static files from React build
-app.use(express.static(path.join(__dirname, '../client/dist')));
+app.use(express.static(path.join(__dirname, '../client/dist'), {
+  setHeaders: (res, path) => {
+    // Set proper MIME types
+    if (path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    }
+    if (path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    }
+  }
+}));
 
 // Serve React app for all non-API routes
 app.get('*', (req, res) => {
