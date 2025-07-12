@@ -17,19 +17,7 @@ const app = express();
 
 // Security middleware - Update helmet configuration for deployment
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
-    },
-  },
+  contentSecurityPolicy: false, // Disable CSP completely for now
   crossOriginOpenerPolicy: false,
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
@@ -57,8 +45,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Add middleware to handle protocol and mixed content
 app.use((req, res, next) => {
-  // Force HTTP protocol for assets
-  res.setHeader('Content-Security-Policy', "upgrade-insecure-requests");
+  // Remove the upgrade-insecure-requests directive that's causing issues
+  // res.setHeader('Content-Security-Policy', "upgrade-insecure-requests");
   
   // Add headers to handle mixed content
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -98,9 +86,16 @@ app.get('*', (req, res) => {
   // Read the HTML file and modify protocol if needed
   let html = fs.readFileSync(indexPath, 'utf8');
   
-  // Replace https:// with http:// for the current server
-  const serverUrl = `http://${req.get('host')}`;
-  html = html.replace(/https:\/\/34\.42\.233\.32:5000/g, serverUrl);
+  // Replace ALL https:// references with http:// for the current server
+  const protocol = req.secure ? 'https' : 'http';
+  const serverUrl = `${protocol}://${req.get('host')}`;
+  
+  // Replace any https references to this domain
+  html = html.replace(/https:\/\/34\.42\.233\.32:5000/g, `http://34.42.233.32:5000`);
+  html = html.replace(/https:\/\/([^\/]*):5000/g, `http://$1:5000`);
+  
+  // Also replace relative protocol references
+  html = html.replace(/\/\/34\.42\.233\.32:5000/g, `//34.42.233.32:5000`);
   
   res.setHeader('Content-Type', 'text/html');
   res.send(html);
