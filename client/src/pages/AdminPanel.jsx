@@ -495,9 +495,9 @@ const AdminPanel = () => {
                     {chatHistory.map((chat) => (
                       <tr key={chat._id}>
                         <td>
-                          {chat.userID.name?.email || 'Unknown User'}
+                          {chat.userID?.email || 'Unknown User'}
                           <br />
-                          <small className="text-muted">{chat.userID.name?.email|| 'N/A'}</small>
+                          <small className="text-muted">{chat.userID?.email|| 'N/A'}</small>
                         </td>
                         <td>
                           <Badge bg="info">{chat.messages?.length || 0} messages</Badge>
