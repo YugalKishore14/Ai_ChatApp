@@ -56,14 +56,14 @@ chatSessionSchema.index({ userId: 1, isActive: 1 });
 chatSessionSchema.index({ lastActivity: -1 });
 
 // Update total messages count when messages are added
-chatSessionSchema.pre('save', function(next) {
+chatSessionSchema.pre('save', function (next) {
     this.totalMessages = this.messages.length;
     this.lastActivity = new Date();
     next();
 });
 
 // Static method to get user's chat sessions
-chatSessionSchema.statics.getUserSessions = function(userId, limit = 20) {
+chatSessionSchema.statics.getUserSessions = function (userId, limit = 20) {
     return this.find({ userId, isActive: true })
         .sort({ lastActivity: -1 })
         .limit(limit)
@@ -71,7 +71,7 @@ chatSessionSchema.statics.getUserSessions = function(userId, limit = 20) {
 };
 
 // Static method to get all sessions for admin
-chatSessionSchema.statics.getAllSessions = function(limit = 50) {
+chatSessionSchema.statics.getAllSessions = function (limit = 50) {
     return this.find({ isActive: true })
         .sort({ lastActivity: -1 })
         .limit(limit)
@@ -79,21 +79,21 @@ chatSessionSchema.statics.getAllSessions = function(limit = 50) {
 };
 
 // Method to add a message to the session
-chatSessionSchema.methods.addMessage = function(role, content, metadata = {}) {
+chatSessionSchema.methods.addMessage = function (role, content, metadata = {}) {
     this.messages.push({
         role,
         content,
         metadata,
         timestamp: new Date()
     });
-    
+
     // Auto-generate title from first user message if not set
     if (!this.title || this.title === 'New Chat') {
         if (role === 'user' && this.messages.length === 1) {
             this.title = content.length > 50 ? content.substring(0, 47) + '...' : content;
         }
     }
-    
+
     return this.save();
 };
 

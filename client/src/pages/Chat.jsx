@@ -23,10 +23,10 @@ const Chat = () => {
   useEffect(() => {
     loadChatHistory();
     inputRef.current?.focus();
-    
+
     // Add chat-active class to body to prevent scrolling
     document.body.classList.add('chat-active');
-    
+
     // Cleanup function to remove class when component unmounts
     return () => {
       document.body.classList.remove('chat-active');
@@ -99,7 +99,7 @@ const Chat = () => {
     const words = text.split(' ');
     let currentText = '';
     let wordIndex = 0;
-    
+
     const interval = setInterval(() => {
       if (wordIndex < words.length) {
         currentText += (wordIndex > 0 ? ' ' : '') + words[wordIndex];
@@ -137,14 +137,14 @@ const Chat = () => {
 
     try {
       const response = await chatAPI.sendMessage(userMessage.content, currentSessionId);
-      
+
       if (response.success) {
         setCurrentSessionId(response.sessionId);
         loadChatHistory();
 
         // Simulate streaming for the AI response without typing indicator
         simulateStreaming(response.aiMessage, (streamedText) => {
-          setMessages(prev => prev.map((msg, index) => 
+          setMessages(prev => prev.map((msg, index) =>
             index === prev.length - 1 ? { ...msg, content: streamedText, isStreaming: streamedText !== response.aiMessage } : msg
           ));
         });
@@ -181,8 +181,8 @@ const Chat = () => {
           <Row className="align-items-center">
             <Col>
               <div className="d-flex align-items-center">
-                <Button 
-                  variant="link" 
+                <Button
+                  variant="link"
                   className="nav-btn"
                   onClick={() => navigate('/dashboard')}
                 >
@@ -219,7 +219,7 @@ const Chat = () => {
         {/* Enhanced Sidebar */}
         <div className={`chat-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
           <div className="sidebar-header">
-            <Button 
+            <Button
               className="new-chat-btn w-100"
               onClick={startNewChat}
             >
@@ -272,23 +272,23 @@ const Chat = () => {
                   <h3>Ready to chat?</h3>
                   <p>Start a conversation with our YUG-AI. Ask anything!</p>
                   <div className="suggested-prompts">
-                    <Button 
-                      variant="outline-primary" 
-                      size="sm" 
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
                       onClick={() => setInput("What can you help me with?")}
                     >
                       What can you help me with?
                     </Button>
-                    <Button 
-                      variant="outline-primary" 
-                      size="sm" 
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
                       onClick={() => setInput("Tell me a joke")}
                     >
                       Tell me a joke
                     </Button>
-                    <Button 
-                      variant="outline-primary" 
-                      size="sm" 
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
                       onClick={() => setInput("Explain quantum computing")}
                     >
                       Explain quantum computing
@@ -332,7 +332,7 @@ const Chat = () => {
                       </div>
                     </div>
                   </div>
-                )                )}
+                ))}
                 <div ref={messagesEndRef} />
               </div>
             )}
