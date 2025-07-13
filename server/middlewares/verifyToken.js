@@ -10,7 +10,7 @@ const verifyToken = async (req, res, next) => {
         const token = authHeader && authHeader.split(' ')[1];
 
         if (!token) {
-            return res.status(401).json({ 
+            return res.status(401).json({
                 message: 'Access token is required',
                 code: 'NO_TOKEN'
             });
@@ -18,11 +18,11 @@ const verifyToken = async (req, res, next) => {
 
         // Verify token
         const decoded = jwt.verify(token, JWT_SECRET);
-        
+
         // Check if user exists and is active
         const user = await User.findById(decoded.id);
         if (!user || !user.isActive) {
-            return res.status(401).json({ 
+            return res.status(401).json({
                 message: 'User not found or inactive',
                 code: 'USER_NOT_FOUND'
             });
@@ -39,18 +39,18 @@ const verifyToken = async (req, res, next) => {
         next();
     } catch (error) {
         if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({ 
+            return res.status(401).json({
                 message: 'Token has expired',
                 code: 'TOKEN_EXPIRED'
             });
         } else if (error.name === 'JsonWebTokenError') {
-            return res.status(401).json({ 
+            return res.status(401).json({
                 message: 'Invalid token',
                 code: 'INVALID_TOKEN'
             });
         } else {
             console.error('Token verification error:', error);
-            return res.status(500).json({ 
+            return res.status(500).json({
                 message: 'Token verification failed',
                 code: 'VERIFICATION_ERROR'
             });
@@ -63,7 +63,7 @@ const verifyAdmin = (req, res, next) => {
     if (req.user && req.user.role === 'admin') {
         next();
     } else {
-        res.status(403).json({ 
+        res.status(403).json({
             message: 'Admin access required',
             code: 'ADMIN_REQUIRED'
         });
@@ -79,7 +79,7 @@ const optionalAuth = async (req, res, next) => {
         if (token) {
             const decoded = jwt.verify(token, JWT_SECRET);
             const user = await User.findById(decoded.id);
-            
+
             if (user && user.isActive) {
                 req.user = {
                     id: user._id,
@@ -89,7 +89,7 @@ const optionalAuth = async (req, res, next) => {
                 };
             }
         }
-        
+
         next();
     } catch (error) {
         // Ignore token errors for optional auth

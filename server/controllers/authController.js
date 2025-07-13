@@ -13,19 +13,19 @@ const generateTokens = (user) => {
         email: user.email,
         role: user.role
     };
-    
+
     const accessToken = jwt.sign(
         payload,
         JWT_SECRET,
-        { expiresIn: '15m' }
+        { expiresIn: '12h' } // Access token valid for 1 hour
     );
-    
+
     const refreshToken = jwt.sign(
         { id: user._id },
         JWT_REFRESH_SECRET,
-        { expiresIn: '7d' }
+        { expiresIn: '7d' } // Refresh token valid for 7 days
     );
-    
+
     return { accessToken, refreshToken };
 };
 
@@ -57,7 +57,7 @@ exports.register = async (req, res) => {
                         return error.msg;
                 }
             });
-            
+
             return res.status(400).json({
                 message: errorMessages[0], // Show first error message
                 errors: errorMessages
@@ -69,8 +69,8 @@ exports.register = async (req, res) => {
         // Check if user already exists
         const existingUser = await User.findOne({ email: email.toLowerCase() });
         if (existingUser) {
-            return res.status(400).json({ 
-                message: 'User with this email already exists' 
+            return res.status(400).json({
+                message: 'User with this email already exists'
             });
         }
 
@@ -92,7 +92,7 @@ exports.register = async (req, res) => {
 
     } catch (error) {
         console.error('Registration Error:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: 'Server error during registration',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
@@ -113,28 +113,28 @@ exports.login = async (req, res) => {
         const { email, password } = req.body;
 
         // Find user by email
-        const user = await User.findOne({ 
+        const user = await User.findOne({
             email: email.toLowerCase().trim(),
-            isActive: true 
+            isActive: true
         });
 
         if (!user) {
-            return res.status(401).json({ 
-                message: 'Invalid email or password' 
+            return res.status(401).json({
+                message: 'Invalid email or password'
             });
         }
 
         // Check password
         const isValidPassword = await user.comparePassword(password);
         if (!isValidPassword) {
-            return res.status(401).json({ 
-                message: 'Invalid email or password' 
+            return res.status(401).json({
+                message: 'Invalid email or password'
             });
         }
 
         // Check if user is approved (admin users are automatically approved)
         if (user.role !== 'admin' && !user.isApproved) {
-            return res.status(403).json({ 
+            return res.status(403).json({
                 message: 'Your account is pending admin approval. Please wait for approval before logging in.',
                 needsApproval: true
             });
@@ -145,7 +145,7 @@ exports.login = async (req, res) => {
 
         // Save refresh token to user
         user.refreshTokens.push({ token: refreshToken });
-        
+
         // Clean up old refresh tokens (keep only last 5)
         if (user.refreshTokens.length > 5) {
             user.refreshTokens = user.refreshTokens.slice(-5);
@@ -164,7 +164,7 @@ exports.login = async (req, res) => {
 
     } catch (error) {
         console.error('Login Error:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: 'Server error during login',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });

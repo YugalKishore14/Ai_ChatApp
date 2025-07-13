@@ -93,6 +93,7 @@ code {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -107,9 +108,11 @@ code {
   0% {
     opacity: 0.6;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     opacity: 0.6;
   }
@@ -191,11 +194,11 @@ code {
   .chat-message {
     max-width: 85%;
   }
-  
+
   .modal-dialog {
     margin: 0.5rem;
   }
-  
+
   .card-body {
     padding: 1rem;
   }
@@ -210,6 +213,7 @@ code {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }

@@ -54,7 +54,7 @@ const AdminPanel = () => {
 
   const handleDeleteUser = async (userId) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
-    
+
     try {
       await adminAPI.deleteUser(userId);
       setUsers(prev => prev.filter(user => user._id !== userId));
@@ -67,7 +67,7 @@ const AdminPanel = () => {
   const handleUpdateUser = async (userData) => {
     try {
       await adminAPI.updateUser(selectedUser._id, userData);
-      setUsers(prev => prev.map(user => 
+      setUsers(prev => prev.map(user =>
         user._id === selectedUser._id ? { ...user, ...userData } : user
       ));
       setShowUserModal(false);
@@ -92,7 +92,7 @@ const AdminPanel = () => {
 
   const handleRejectUser = async (userId) => {
     if (!window.confirm('Are you sure you want to reject this user registration? This action cannot be undone.')) return;
-    
+
     try {
       await adminAPI.rejectUser(userId);
       setPendingUsers(prev => prev.filter(user => user._id !== userId));
@@ -245,7 +245,7 @@ const AdminPanel = () => {
             )}
             <span>{notification.message}</span>
           </div>
-          <button 
+          <button
             className="notification-close"
             onClick={() => setNotification(null)}
           >
@@ -265,7 +265,7 @@ const AdminPanel = () => {
                 </div>
                 <div className="ms-3">
                   <h4 className="mb-0 brand-text">Admin Panel</h4>
-                  <small style={{color: 'rgba(255, 255, 255, 0.8)'}}>System Management</small>
+                  <small style={{ color: 'rgba(255, 255, 255, 0.8)' }}>System Management</small>
                 </div>
               </div>
             </Col>
@@ -280,16 +280,16 @@ const AdminPanel = () => {
                     <div className="user-role">Administrator</div>
                   </div>
                 </div>
-                <Button 
-                  variant="outline-primary" 
+                <Button
+                  variant="outline-primary"
                   className="modern-btn"
                   onClick={() => navigate('/dashboard')}
                 >
                   <FaHome className="me-2" />
                   Dashboard
                 </Button>
-                <Button 
-                  variant="outline-secondary" 
+                <Button
+                  variant="outline-secondary"
                   className="logout-btn"
                   onClick={handleLogout}
                   title="Logout"
@@ -303,123 +303,172 @@ const AdminPanel = () => {
       </header>
 
       <Container fluid className="py-4">
-      <Row className="mb-4">
-        <Col>
-          <div className="d-flex justify-content-between align-items-center">
-            <div>
-              <h2 className="mb-0">
-                <FaUserShield className="me-2 text-primary" />
-                Admin Panel
-              </h2>
-              <p className="text-muted mb-0">Manage users and monitor chat activity</p>
-            </div>
-            <Button variant="outline-primary" onClick={() => navigate('/chat')}>
-              <FaArrowLeft className="me-2" />
-              Back to Chat
-            </Button>
-          </div>
-        </Col>
-      </Row>
-
-      {/* Stats Cards */}
-      <Row className="mb-4">
-        <Col md={6} lg={3}>
-          <Card className="text-center h-100">
-            <Card.Body>
-              <FaUsers size={40} className="text-primary mb-2" />
-              <h4 className="mb-0">{users.length}</h4>
-              <p className="text-muted mb-0">Total Users</p>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={6} lg={3}>
-          <Card className="text-center h-100">
-            <Card.Body>
-              <FaComments size={40} className="text-success mb-2" />
-              <h4 className="mb-0">{chatHistory.length}</h4>
-              <p className="text-muted mb-0">Chat Sessions</p>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={6} lg={3}>
-          <Card className="text-center h-100">
-            <Card.Body>
-              <FaUserShield size={40} className="text-warning mb-2" />
-              <h4 className="mb-0">{users.filter(u => u.role === 'admin').length}</h4>
-              <p className="text-muted mb-0">Admins</p>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={6} lg={3}>
-          <Card className="text-center h-100">
-            <Card.Body>
-              <FaDownload size={40} className="text-info mb-2" />
-              <Button variant="outline-info" size="sm" onClick={handleExportChats}>
-                Export Data
+        <Row className="mb-4">
+          <Col>
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <h2 className="mb-0">
+                  <FaUserShield className="me-2 text-primary" />
+                  Admin Panel
+                </h2>
+                <p className="text-muted mb-0">Manage users and monitor chat activity</p>
+              </div>
+              <Button variant="outline-primary" onClick={() => navigate('/chat')}>
+                <FaArrowLeft className="me-2" />
+                Back to Chat
               </Button>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+            </div>
+          </Col>
+        </Row>
 
-      {/* Main Content */}
-      <Card>
-        <Card.Body>
-          <Tabs
-            activeKey={activeTab}
-            onSelect={(tab) => setActiveTab(tab)}
-            className="mb-3"
-          >
-            {/* Pending Users Tab */}
-            <Tab eventKey="pending" title={
-              <span>
-                Pending Approval 
-                {pendingUsers.length > 0 && (
-                  <Badge bg="warning" className="ms-2">{pendingUsers.length}</Badge>
+        {/* Stats Cards */}
+        <Row className="mb-4">
+          <Col md={6} lg={3}>
+            <Card className="text-center h-100">
+              <Card.Body>
+                <FaUsers size={40} className="text-primary mb-2" />
+                <h4 className="mb-0">{users.length}</h4>
+                <p className="text-muted mb-0">Total Users</p>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={6} lg={3}>
+            <Card className="text-center h-100">
+              <Card.Body>
+                <FaComments size={40} className="text-success mb-2" />
+                <h4 className="mb-0">{chatHistory.length}</h4>
+                <p className="text-muted mb-0">Chat Sessions</p>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={6} lg={3}>
+            <Card className="text-center h-100">
+              <Card.Body>
+                <FaUserShield size={40} className="text-warning mb-2" />
+                <h4 className="mb-0">{users.filter(u => u.role === 'admin').length}</h4>
+                <p className="text-muted mb-0">Admins</p>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={6} lg={3}>
+            <Card className="text-center h-100">
+              <Card.Body>
+                <FaDownload size={40} className="text-info mb-2" />
+                <Button variant="outline-info" size="sm" onClick={handleExportChats}>
+                  Export Data
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Main Content */}
+        <Card>
+          <Card.Body>
+            <Tabs
+              activeKey={activeTab}
+              onSelect={(tab) => setActiveTab(tab)}
+              className="mb-3"
+            >
+              {/* Pending Users Tab */}
+              <Tab eventKey="pending" title={
+                <span>
+                  Pending Approval
+                  {pendingUsers.length > 0 && (
+                    <Badge bg="warning" className="ms-2">{pendingUsers.length}</Badge>
+                  )}
+                </span>
+              }>
+                {pendingUsers.length === 0 ? (
+                  <Alert variant="info">
+                    <i className="fas fa-info-circle me-2"></i>
+                    No users pending approval
+                  </Alert>
+                ) : (
+                  <div className="table-responsive">
+                    <Table striped hover>
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Registration Date</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {pendingUsers.map((user) => (
+                          <tr key={user._id}>
+                            <td>
+                              <strong>{user.name}</strong>
+                            </td>
+                            <td>{user.email}</td>
+                            <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                            <td>
+                              <Button
+                                variant="success"
+                                size="sm"
+                                className="me-2"
+                                onClick={() => handleApproveUser(user._id)}
+                              >
+                                <i className="fas fa-check me-1"></i>
+                                Approve
+                              </Button>
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() => handleRejectUser(user._id)}
+                              >
+                                <i className="fas fa-times me-1"></i>
+                                Reject
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </div>
                 )}
-              </span>
-            }>
-              {pendingUsers.length === 0 ? (
-                <Alert variant="info">
-                  <i className="fas fa-info-circle me-2"></i>
-                  No users pending approval
-                </Alert>
-              ) : (
+              </Tab>
+
+              {/* Users Tab */}
+              <Tab eventKey="users" title="Users Management">
                 <div className="table-responsive">
                   <Table striped hover>
                     <thead>
                       <tr>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>Registration Date</th>
+                        <th>Role</th>
+                        <th>Joined</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {pendingUsers.map((user) => (
+                      {users.map((user) => (
                         <tr key={user._id}>
-                          <td>
-                            <strong>{user.name}</strong>
-                          </td>
+                          <td>{user.name}</td>
                           <td>{user.email}</td>
+                          <td>
+                            <Badge bg={user.role === 'admin' ? 'primary' : 'secondary'}>
+                              {user.role}
+                            </Badge>
+                          </td>
                           <td>{new Date(user.createdAt).toLocaleDateString()}</td>
                           <td>
                             <Button
-                              variant="success"
+                              variant="outline-primary"
                               size="sm"
                               className="me-2"
-                              onClick={() => handleApproveUser(user._id)}
+                              onClick={() => openUserModal(user)}
                             >
-                              <i className="fas fa-check me-1"></i>
-                              Approve
+                              <FaEdit />
                             </Button>
                             <Button
-                              variant="danger"
+                              variant="outline-danger"
                               size="sm"
-                              onClick={() => handleRejectUser(user._id)}
+                              onClick={() => handleDeleteUser(user._id)}
                             >
-                              <i className="fas fa-times me-1"></i>
-                              Reject
+                              <FaTrash />
                             </Button>
                           </td>
                         </tr>
@@ -427,106 +476,57 @@ const AdminPanel = () => {
                     </tbody>
                   </Table>
                 </div>
-              )}
-            </Tab>
+              </Tab>
 
-            {/* Users Tab */}
-            <Tab eventKey="users" title="Users Management">
-              <div className="table-responsive">
-                <Table striped hover>
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Role</th>
-                      <th>Joined</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.map((user) => (
-                      <tr key={user._id}>
-                        <td>{user.name}</td>
-                        <td>{user.email}</td>
-                        <td>
-                          <Badge bg={user.role === 'admin' ? 'primary' : 'secondary'}>
-                            {user.role}
-                          </Badge>
-                        </td>
-                        <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-                        <td>
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            className="me-2"
-                            onClick={() => openUserModal(user)}
-                          >
-                            <FaEdit />
-                          </Button>
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            onClick={() => handleDeleteUser(user._id)}
-                          >
-                            <FaTrash />
-                          </Button>
-                        </td>
+              {/* Chat History Tab */}
+              <Tab eventKey="chats" title="Chat History">
+                <div className="table-responsive">
+                  <Table striped hover>
+                    <thead>
+                      <tr>
+                        <th>User</th>
+                        <th>Messages</th>
+                        <th>Created</th>
+                        <th>Last Activity</th>
+                        <th>Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </div>
-            </Tab>
+                    </thead>
+                    <tbody>
+                      {chatHistory.map((chat) => (
+                        <tr key={chat._id}>
+                          <td>
+                            {chat.userID?.email || 'Unknown User'}
+                            <br />
+                            <small className="text-muted">{chat.userID?.email || 'N/A'}</small>
+                          </td>
+                          <td>
+                            <Badge bg="info">{chat.messages?.length || 0} messages</Badge>
+                          </td>
+                          <td>{new Date(chat.createdAt).toLocaleDateString()}</td>
+                          <td>{new Date(chat.updatedAt).toLocaleDateString()}</td>
+                          <td>
+                            <Button
+                              variant="outline-primary"
+                              size="sm"
+                              onClick={() => openChatModal(chat)}
+                            >
+                              <FaEye />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              </Tab>
+            </Tabs>
+          </Card.Body>
+        </Card>
 
-            {/* Chat History Tab */}
-            <Tab eventKey="chats" title="Chat History">
-              <div className="table-responsive">
-                <Table striped hover>
-                  <thead>
-                    <tr>
-                      <th>User</th>
-                      <th>Messages</th>
-                      <th>Created</th>
-                      <th>Last Activity</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {chatHistory.map((chat) => (
-                      <tr key={chat._id}>
-                        <td>
-                          {chat.userID?.email || 'Unknown User'}
-                          <br />
-                          <small className="text-muted">{chat.userID?.email|| 'N/A'}</small>
-                        </td>
-                        <td>
-                          <Badge bg="info">{chat.messages?.length || 0} messages</Badge>
-                        </td>
-                        <td>{new Date(chat.createdAt).toLocaleDateString()}</td>
-                        <td>{new Date(chat.updatedAt).toLocaleDateString()}</td>
-                        <td>
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            onClick={() => openChatModal(chat)}
-                          >
-                            <FaEye />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </div>
-            </Tab>
-          </Tabs>
-        </Card.Body>
-      </Card>
-
-      {/* Modals */}
-      <UserModal />
-      <ChatModal />
-    </Container>
+        {/* Modals */}
+        <UserModal />
+        <ChatModal />
+      </Container>
     </>
   );
 };
