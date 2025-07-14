@@ -1,9 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Table, Button, Modal, Form, Badge, Tabs, Tab, Alert, Spinner } from 'react-bootstrap';
-import { FaUsers, FaComments, FaDownload, FaTrash, FaEdit, FaEye, FaUserShield, FaArrowLeft, FaCheckCircle, FaExclamationTriangle, FaBrain, FaHome } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import { adminAPI } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Table,
+  Button,
+  Modal,
+  Form,
+  Badge,
+  Tabs,
+  Tab,
+  Alert,
+  Spinner,
+} from "react-bootstrap";
+import {
+  FaUsers,
+  FaComments,
+  FaDownload,
+  FaTrash,
+  FaEdit,
+  FaEye,
+  FaUserShield,
+  FaArrowLeft,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaBrain,
+  FaHome,
+} from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { adminAPI } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 const AdminPanel = () => {
   const navigate = useNavigate();
@@ -16,18 +43,18 @@ const AdminPanel = () => {
   const [showChatModal, setShowChatModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedChat, setSelectedChat] = useState(null);
-  const [activeTab, setActiveTab] = useState('pending');
+  const [activeTab, setActiveTab] = useState("pending");
   const [notification, setNotification] = useState(null);
 
   // Custom notification function
-  const showNotification = (message, type = 'info') => {
+  const showNotification = (message, type = "info") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 5000);
   };
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   useEffect(() => {
@@ -40,65 +67,72 @@ const AdminPanel = () => {
       const [usersResponse, pendingResponse, chatResponse] = await Promise.all([
         adminAPI.getAllUsers(),
         adminAPI.getPendingUsers(),
-        adminAPI.getAllChatHistory()
+        adminAPI.getAllChatHistory(),
       ]);
       setUsers(usersResponse.users || []);
       setPendingUsers(pendingResponse.users || []);
       setChatHistory(chatResponse.chats || []);
     } catch (error) {
-      showNotification('Failed to load admin data', 'error');
+      showNotification("Failed to load admin data", "error");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteUser = async (userId) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
 
     try {
       await adminAPI.deleteUser(userId);
-      setUsers(prev => prev.filter(user => user._id !== userId));
-      showNotification('User deleted successfully', 'success');
+      setUsers((prev) => prev.filter((user) => user._id !== userId));
+      showNotification("User deleted successfully", "success");
     } catch (error) {
-      showNotification('Failed to delete user', 'error');
+      showNotification("Failed to delete user", "error");
     }
   };
 
   const handleUpdateUser = async (userData) => {
     try {
       await adminAPI.updateUser(selectedUser._id, userData);
-      setUsers(prev => prev.map(user =>
-        user._id === selectedUser._id ? { ...user, ...userData } : user
-      ));
+      setUsers((prev) =>
+        prev.map((user) =>
+          user._id === selectedUser._id ? { ...user, ...userData } : user
+        )
+      );
       setShowUserModal(false);
       setSelectedUser(null);
-      toast.success('User updated successfully');
+      toast.success("User updated successfully");
     } catch (error) {
-      toast.error('Failed to update user');
+      toast.error("Failed to update user");
     }
   };
 
   const handleApproveUser = async (userId) => {
     try {
       await adminAPI.approveUser(userId);
-      setPendingUsers(prev => prev.filter(user => user._id !== userId));
+      setPendingUsers((prev) => prev.filter((user) => user._id !== userId));
       // Refresh the approved users list
       loadData();
-      showNotification('User approved successfully', 'success');
+      showNotification("User approved successfully", "success");
     } catch (error) {
-      showNotification('Failed to approve user', 'error');
+      showNotification("Failed to approve user", "error");
     }
   };
 
   const handleRejectUser = async (userId) => {
-    if (!window.confirm('Are you sure you want to reject this user registration? This action cannot be undone.')) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to reject this user registration? This action cannot be undone."
+      )
+    )
+      return;
 
     try {
       await adminAPI.rejectUser(userId);
-      setPendingUsers(prev => prev.filter(user => user._id !== userId));
-      showNotification('User registration rejected', 'success');
+      setPendingUsers((prev) => prev.filter((user) => user._id !== userId));
+      showNotification("User registration rejected", "success");
     } catch (error) {
-      showNotification('Failed to reject user', 'error');
+      showNotification("Failed to reject user", "error");
     }
   };
 
@@ -106,16 +140,17 @@ const AdminPanel = () => {
     try {
       const blob = await adminAPI.exportChatData();
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `chat-export-${new Date().toISOString().split('T')[0]}.json`;
+      link.download = `chat-export-${new Date().toISOString().split("T")[0]
+        }.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      showNotification('Chat data exported successfully', 'success');
+      showNotification("Chat data exported successfully", "success");
     } catch (error) {
-      showNotification('Failed to export chat data', 'error');
+      showNotification("Failed to export chat data", "error");
     }
   };
 
@@ -136,15 +171,17 @@ const AdminPanel = () => {
       </Modal.Header>
       <Modal.Body>
         {selectedUser && (
-          <Form onSubmit={(e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            handleUpdateUser({
-              name: formData.get('name'),
-              email: formData.get('email'),
-              role: formData.get('role')
-            });
-          }}>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target);
+              handleUpdateUser({
+                name: formData.get("name"),
+                email: formData.get("email"),
+                role: formData.get("role"),
+              });
+            }}
+          >
             <Form.Group className="mb-3">
               <Form.Label>Name</Form.Label>
               <Form.Control
@@ -171,7 +208,10 @@ const AdminPanel = () => {
               </Form.Select>
             </Form.Group>
             <div className="d-flex justify-content-end gap-2">
-              <Button variant="secondary" onClick={() => setShowUserModal(false)}>
+              <Button
+                variant="secondary"
+                onClick={() => setShowUserModal(false)}
+              >
                 Cancel
               </Button>
               <Button variant="primary" type="submit">
@@ -185,7 +225,11 @@ const AdminPanel = () => {
   );
 
   const ChatModal = () => (
-    <Modal show={showChatModal} onHide={() => setShowChatModal(false)} size="lg">
+    <Modal
+      show={showChatModal}
+      onHide={() => setShowChatModal(false)}
+      size="lg"
+    >
       <Modal.Header closeButton>
         <Modal.Title>Chat Session Details</Modal.Title>
       </Modal.Header>
@@ -193,23 +237,40 @@ const AdminPanel = () => {
         {selectedChat && (
           <div>
             <div className="mb-3">
-              <strong>User:</strong> {selectedChat.user?.name || 'Unknown'} ({selectedChat.user?.email || 'N/A'})
+              <strong>User:</strong> {selectedChat.user?.name || "Unknown"} (
+              {selectedChat.user?.email || "N/A"})
             </div>
             <div className="mb-3">
-              <strong>Created:</strong> {new Date(selectedChat.createdAt).toLocaleString()}
+              <strong>Created:</strong>{" "}
+              {new Date(selectedChat.createdAt).toLocaleString()}
             </div>
             <div className="mb-3">
-              <strong>Last Updated:</strong> {new Date(selectedChat.updatedAt).toLocaleString()}
+              <strong>Last Updated:</strong>{" "}
+              {new Date(selectedChat.updatedAt).toLocaleString()}
             </div>
             <hr />
             <h6>Messages:</h6>
-            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+            <div style={{ maxHeight: "400px", overflowY: "auto" }}>
               {selectedChat.messages?.map((message, index) => (
-                <div key={index} className={`mb-2 p-2 rounded ${message.role === 'user' ? 'bg-primary text-white' : 'bg-light'}`}>
-                  <div className="fw-bold">{message.role === 'user' ? 'User' : 'AI'}:</div>
-                  <div style={{ whiteSpace: 'pre-wrap' }}>{message.content}</div>
+                <div
+                  key={index}
+                  className={`mb-2 p-2 rounded ${message.role === "user"
+                      ? "bg-primary text-white"
+                      : "bg-light"
+                    }`}
+                >
+                  <div className="fw-bold">
+                    {message.role === "user" ? "User" : "AI"}:
+                  </div>
+                  <div style={{ whiteSpace: "pre-wrap" }}>
+                    {message.content}
+                  </div>
                   {message.timestamp && (
-                    <small className={message.role === 'user' ? 'text-light' : 'text-muted'}>
+                    <small
+                      className={
+                        message.role === "user" ? "text-light" : "text-muted"
+                      }
+                    >
                       {new Date(message.timestamp).toLocaleString()}
                     </small>
                   )}
@@ -236,9 +297,11 @@ const AdminPanel = () => {
     <>
       {/* Custom Notification */}
       {notification && (
-        <div className={`custom-notification custom-notification-${notification.type}`}>
+        <div
+          className={`custom-notification custom-notification-${notification.type}`}
+        >
           <div className="d-flex align-items-center">
-            {notification.type === 'success' ? (
+            {notification.type === "success" ? (
               <FaCheckCircle className="me-2" />
             ) : (
               <FaExclamationTriangle className="me-2" />
@@ -265,7 +328,9 @@ const AdminPanel = () => {
                 </div>
                 <div className="ms-3">
                   <h4 className="mb-0 brand-text">Admin Panel</h4>
-                  <small style={{ color: 'rgba(255, 255, 255, 0.8)' }}>System Management</small>
+                  <small style={{ color: "rgba(255, 255, 255, 0.8)" }}>
+                    System Management
+                  </small>
                 </div>
               </div>
             </Col>
@@ -283,7 +348,7 @@ const AdminPanel = () => {
                 <Button
                   variant="outline-primary"
                   className="modern-btn"
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate("/dashboard")}
                 >
                   <FaHome className="me-2" />
                   Dashboard
@@ -311,9 +376,14 @@ const AdminPanel = () => {
                   <FaUserShield className="me-2 text-primary" />
                   Admin Panel
                 </h2>
-                <p className="text-muted mb-0">Manage users and monitor chat activity</p>
+                <p className="text-muted mb-0">
+                  Manage users and monitor chat activity
+                </p>
               </div>
-              <Button variant="outline-primary" onClick={() => navigate('/chat')}>
+              <Button
+                variant="outline-primary"
+                onClick={() => navigate("/chat")}
+              >
                 <FaArrowLeft className="me-2" />
                 Back to Chat
               </Button>
@@ -345,7 +415,9 @@ const AdminPanel = () => {
             <Card className="text-center h-100">
               <Card.Body>
                 <FaUserShield size={40} className="text-warning mb-2" />
-                <h4 className="mb-0">{users.filter(u => u.role === 'admin').length}</h4>
+                <h4 className="mb-0">
+                  {users.filter((u) => u.role === "admin").length}
+                </h4>
                 <p className="text-muted mb-0">Admins</p>
               </Card.Body>
             </Card>
@@ -354,7 +426,11 @@ const AdminPanel = () => {
             <Card className="text-center h-100">
               <Card.Body>
                 <FaDownload size={40} className="text-info mb-2" />
-                <Button variant="outline-info" size="sm" onClick={handleExportChats}>
+                <Button
+                  variant="outline-info"
+                  size="sm"
+                  onClick={handleExportChats}
+                >
                   Export Data
                 </Button>
               </Card.Body>
@@ -371,14 +447,19 @@ const AdminPanel = () => {
               className="mb-3"
             >
               {/* Pending Users Tab */}
-              <Tab eventKey="pending" title={
-                <span>
-                  Pending Approval
-                  {pendingUsers.length > 0 && (
-                    <Badge bg="warning" className="ms-2">{pendingUsers.length}</Badge>
-                  )}
-                </span>
-              }>
+              <Tab
+                eventKey="pending"
+                title={
+                  <span>
+                    Pending Approval
+                    {pendingUsers.length > 0 && (
+                      <Badge bg="warning" className="ms-2">
+                        {pendingUsers.length}
+                      </Badge>
+                    )}
+                  </span>
+                }
+              >
                 {pendingUsers.length === 0 ? (
                   <Alert variant="info">
                     <i className="fas fa-info-circle me-2"></i>
@@ -402,7 +483,9 @@ const AdminPanel = () => {
                               <strong>{user.name}</strong>
                             </td>
                             <td>{user.email}</td>
-                            <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                            <td>
+                              {new Date(user.createdAt).toLocaleDateString()}
+                            </td>
                             <td>
                               <Button
                                 variant="success"
@@ -446,14 +529,23 @@ const AdminPanel = () => {
                     <tbody>
                       {users.map((user) => (
                         <tr key={user._id}>
-                          <td>{user.name}</td>
+                          <td>
+                            {" "}
+                            <strong>{user.name}</strong>
+                          </td>
                           <td>{user.email}</td>
                           <td>
-                            <Badge bg={user.role === 'admin' ? 'primary' : 'secondary'}>
+                            <Badge
+                              bg={
+                                user.role === "admin" ? "primary" : "secondary"
+                              }
+                            >
                               {user.role}
                             </Badge>
                           </td>
-                          <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                          <td>
+                            {new Date(user.createdAt).toLocaleDateString()}
+                          </td>
                           <td>
                             <Button
                               variant="outline-primary"
@@ -495,15 +587,25 @@ const AdminPanel = () => {
                       {chatHistory.map((chat) => (
                         <tr key={chat._id}>
                           <td>
-                            {chat.userID?.email || 'Unknown User'}
+                            <strong>
+                              {chat.userId?.name || "Unknown User"}
+                            </strong>
                             <br />
-                            <small className="text-muted">{chat.userID?.email || 'N/A'}</small>
+                            <small className="text-muted">
+                              {chat.userId?.email || "N/A"}
+                            </small>
                           </td>
                           <td>
-                            <Badge bg="info">{chat.messages?.length || 0} messages</Badge>
+                            <Badge bg="info">
+                              {chat.messages?.length || 0} messages
+                            </Badge>
                           </td>
-                          <td>{new Date(chat.createdAt).toLocaleDateString()}</td>
-                          <td>{new Date(chat.updatedAt).toLocaleDateString()}</td>
+                          <td>
+                            {new Date(chat.createdAt).toLocaleDateString()}
+                          </td>
+                          <td>
+                            {new Date(chat.updatedAt).toLocaleDateString()}
+                          </td>
                           <td>
                             <Button
                               variant="outline-primary"
