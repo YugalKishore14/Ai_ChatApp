@@ -237,8 +237,8 @@ const AdminPanel = () => {
         {selectedChat && (
           <div>
             <div className="mb-3">
-              <strong>User:</strong> {selectedChat.user?.name || "Unknown"} (
-              {selectedChat.user?.email || "N/A"})
+              <strong>User:</strong> {selectedChat.userId?.name || "Unknown"} (
+              {selectedChat.userId?.email || "N/A"})
             </div>
             <div className="mb-3">
               <strong>Created:</strong>{" "}
@@ -255,8 +255,8 @@ const AdminPanel = () => {
                 <div
                   key={index}
                   className={`mb-2 p-2 rounded ${message.role === "user"
-                      ? "bg-primary text-white"
-                      : "bg-light"
+                    ? "bg-primary text-white"
+                    : "bg-light"
                     }`}
                 >
                   <div className="fw-bold">
