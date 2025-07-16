@@ -1,16 +1,18 @@
 const express = require('express');
-const { 
-    register, 
-    login, 
-    refreshToken, 
-    logout, 
-    getProfile 
+const {
+    register,
+    login,
+    refreshToken,
+    logout,
+    getProfile,
+    verifyEmail,
+    verifyOtp
 } = require('../controllers/authController');
 const { verifyToken } = require('../middlewares/verifyToken');
-const { 
-    validateRegister, 
-    validateLogin, 
-    validateRefreshToken 
+const {
+    validateRegister,
+    validateLogin,
+    validateRefreshToken
 } = require('../middlewares/validation');
 
 const router = express.Router();
@@ -20,10 +22,20 @@ const router = express.Router();
 // @access  Public
 router.post('/register', validateRegister, register);
 
+// @route   GET /api/auth/verify/:token
+// @desc    Verify email via token link
+// @access  Public
+router.get('/verify/:token', verifyEmail);
+
 // @route   POST /api/auth/login
 // @desc    Login user
 // @access  Public
 router.post('/login', validateLogin, login);
+
+// @route   POST /api/auth/verify-otp
+// @desc    Verify OTP after login or signup
+// @access  Public
+router.post('/verify-otp', verifyOtp);
 
 // @route   POST /api/auth/refresh
 // @desc    Refresh access token

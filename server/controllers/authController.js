@@ -1,11 +1,14 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
+const bcrypt = require('bcrypt');
+const Otp = require('../models/otp.model');
+const { sendEmail } = require('../services/email.service');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your_refresh_secret';
 
-// Generate tokens
+// -------------------- TOKEN HELPERS --------------------
 const generateTokens = (user) => {
     const payload = {
         id: user._id,
@@ -14,189 +17,190 @@ const generateTokens = (user) => {
         role: user.role
     };
 
-    const accessToken = jwt.sign(
-        payload,
-        JWT_SECRET,
-        { expiresIn: '12h' } // Access token valid for 1 hour
-    );
-
-    const refreshToken = jwt.sign(
-        { id: user._id },
-        JWT_REFRESH_SECRET,
-        { expiresIn: '7d' } // Refresh token valid for 7 days
-    );
+    const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '12h' });
+    const refreshToken = jwt.sign({ id: user._id }, JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
     return { accessToken, refreshToken };
 };
 
-// Get user data for JWT payload
-const getUserData = (user) => {
-    return {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-    };
-};
+const getUserData = (user) => ({
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role
+});
 
+// -------------------- REGISTER --------------------
 exports.register = async (req, res) => {
     try {
-        // Check validation errors
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            // Get specific error messages
             const errorMessages = errors.array().map(error => {
                 switch (error.path) {
-                    case 'name':
-                        return 'Name must be at least 2 characters long';
-                    case 'email':
-                        return 'Please provide a valid email address';
-                    case 'password':
-                        return 'Password must be at least 6 characters long';
-                    default:
-                        return error.msg;
+                    case 'name': return 'Name must be at least 2 characters long';
+                    case 'email': return 'Please provide a valid email address';
+                    case 'password': return 'Password must be at least 6 characters long';
+                    default: return error.msg;
                 }
             });
-
-            return res.status(400).json({
-                message: errorMessages[0], // Show first error message
-                errors: errorMessages
-            });
+            return res.status(400).json({ message: errorMessages[0], errors: errorMessages });
         }
 
         const { name, email, password } = req.body;
 
-        // Check if user already exists
         const existingUser = await User.findOne({ email: email.toLowerCase() });
         if (existingUser) {
-            return res.status(400).json({
-                message: 'User with this email already exists'
-            });
+            return res.status(400).json({ message: 'User with this email already exists' });
         }
 
-        // Create new user (requires admin approval)
         const user = new User({
             name: name.trim(),
             email: email.toLowerCase().trim(),
-            password,
-            isApproved: false // Users need admin approval
+            password
         });
 
         await user.save();
 
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        await Otp.create({
+            email,
+            otp,
+            expiresAt: new Date(Date.now() + 3 * 60 * 1000) // 2 mins
+        });
+
+        await sendEmail(
+            email,
+            'Your OTP Code',
+            `<h1>Your OTP is: ${otp}</h1><p>This OTP is valid for 2 minutes.</p>`
+        );
+
         res.status(201).json({
-            message: 'Account created successfully! Please wait for admin approval before you can log in.',
-            needsApproval: true,
+            message: 'Account created successfully! OTP sent to your email.',
             email: user.email
         });
 
     } catch (error) {
         console.error('Registration Error:', error);
-        res.status(500).json({
-            message: 'Server error during registration',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
+        res.status(500).json({ message: 'Server error during registration' });
     }
 };
 
+// -------------------- LOGIN --------------------
 exports.login = async (req, res) => {
     try {
-        // Check validation errors
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({
-                message: 'Validation failed',
-                errors: errors.array()
-            });
+            return res.status(400).json({ message: 'Validation failed', errors: errors.array() });
         }
 
         const { email, password } = req.body;
 
-        // Find user by email
-        const user = await User.findOne({
-            email: email.toLowerCase().trim(),
-            isActive: true
+        const user = await User.findOne({ email: email.toLowerCase().trim(), isActive: true });
+        if (!user || !(await user.comparePassword(password))) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        await Otp.create({
+            email,
+            otp,
+            expiresAt: new Date(Date.now() + 2 * 60 * 1000)
         });
 
+        await sendEmail(
+            email,
+            'Your OTP Code',
+            `<h1>Your OTP is: ${otp}</h1><p>This OTP is valid for 2 minutes.</p>`
+        );
+
+        return res.status(200).json({ message: 'OTP sent to your email', email });
+
+    } catch (error) {
+        console.error('Login Error:', error);
+        res.status(500).json({ message: 'Server error during login' });
+    }
+};
+
+// -------------------- OTP VERIFY --------------------
+exports.verifyOtp = async (req, res) => {
+    const { email, otp } = req.body;
+
+    try {
+        const record = await Otp.findOne({ email, otp });
+
+        if (!record) {
+            return res.status(400).json({ message: 'Invalid OTP' });
+        }
+
+        if (record.expiresAt < new Date()) {
+            return res.status(400).json({ message: 'OTP expired' });
+        }
+
+        const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({
-                message: 'Invalid email or password'
-            });
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        // Check password
-        const isValidPassword = await user.comparePassword(password);
-        if (!isValidPassword) {
-            return res.status(401).json({
-                message: 'Invalid email or password'
-            });
-        }
+        user.isVerified = true;
+        user.lastLogin = new Date();
 
-        // Check if user is approved (admin users are automatically approved)
-        if (user.role !== 'admin' && !user.isApproved) {
-            return res.status(403).json({
-                message: 'Your account is pending admin approval. Please wait for approval before logging in.',
-                needsApproval: true
-            });
-        }
-
-        // Generate tokens
         const { accessToken, refreshToken } = generateTokens(user);
-
-        // Save refresh token to user
         user.refreshTokens.push({ token: refreshToken });
-
-        // Clean up old refresh tokens (keep only last 5)
         if (user.refreshTokens.length > 5) {
             user.refreshTokens = user.refreshTokens.slice(-5);
         }
 
-        // Update last login
-        user.lastLogin = new Date();
         await user.save();
 
-        res.json({
-            message: 'Login successful',
+        return res.status(200).json({
+            message: 'OTP verified successfully',
             token: accessToken,
             refreshToken,
             user: getUserData(user)
         });
 
     } catch (error) {
-        console.error('Login Error:', error);
-        res.status(500).json({
-            message: 'Server error during login',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
+        console.error('OTP Verification Error:', error);
+        res.status(500).json({ message: 'Server error during OTP verification' });
     }
 };
 
+// -------------------- EMAIL VERIFY --------------------
+exports.verifyEmail = async (req, res) => {
+    const token = req.params.token;
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const user = await User.findById(decoded.id);
+
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        user.isVerified = true;
+        await user.save();
+
+        res.redirect('http://localhost:3000/login');
+
+    } catch (error) {
+        console.error('Email Verification Error:', error);
+        return res.status(400).json({ message: 'Invalid or expired token' });
+    }
+};
+
+// -------------------- TOKEN REFRESH --------------------
 exports.refreshToken = async (req, res) => {
     try {
         const { refreshToken } = req.body;
+        if (!refreshToken) return res.status(401).json({ message: 'Refresh token is required' });
 
-        if (!refreshToken) {
-            return res.status(401).json({ message: 'Refresh token is required' });
-        }
-
-        // Verify refresh token
         const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
         const user = await User.findById(decoded.id);
+        if (!user || !user.isActive) return res.status(401).json({ message: 'Invalid refresh token' });
 
-        if (!user || !user.isActive) {
-            return res.status(401).json({ message: 'Invalid refresh token' });
-        }
-
-        // Check if refresh token exists in user's tokens
         const tokenExists = user.refreshTokens.some(t => t.token === refreshToken);
-        if (!tokenExists) {
-            return res.status(401).json({ message: 'Refresh token not found' });
-        }
+        if (!tokenExists) return res.status(401).json({ message: 'Refresh token not found' });
 
-        // Generate new tokens
         const { accessToken, refreshToken: newRefreshToken } = generateTokens(user);
 
-        // Replace old refresh token with new one
         user.refreshTokens = user.refreshTokens.filter(t => t.token !== refreshToken);
         user.refreshTokens.push({ token: newRefreshToken });
         await user.save();
@@ -214,18 +218,17 @@ exports.refreshToken = async (req, res) => {
     }
 };
 
+// -------------------- LOGOUT --------------------
 exports.logout = async (req, res) => {
     try {
         const { refreshToken } = req.body;
         const userId = req.user.id;
 
         if (refreshToken) {
-            // Remove specific refresh token
             await User.findByIdAndUpdate(userId, {
                 $pull: { refreshTokens: { token: refreshToken } }
             });
         } else {
-            // Remove all refresh tokens (logout from all devices)
             await User.findByIdAndUpdate(userId, {
                 $set: { refreshTokens: [] }
             });
@@ -239,6 +242,7 @@ exports.logout = async (req, res) => {
     }
 };
 
+// -------------------- PROFILE --------------------
 exports.getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);

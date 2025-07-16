@@ -8,12 +8,12 @@ const validateRegister = [
         .withMessage('Name must be between 2 and 50 characters')
         .matches(/^[a-zA-Z\s]+$/)
         .withMessage('Name can only contain letters and spaces'),
-    
+
     body('email')
         .isEmail()
         .normalizeEmail()
         .withMessage('Please provide a valid email address'),
-    
+
     body('password')
         .isLength({ min: 6 })
         .withMessage('Password must be at least 6 characters long')
@@ -27,7 +27,7 @@ const validateLogin = [
         .isEmail()
         .normalizeEmail()
         .withMessage('Please provide a valid email address'),
-    
+
     body('password')
         .notEmpty()
         .withMessage('Password is required')
@@ -39,7 +39,7 @@ const validateChatMessage = [
         .trim()
         .isLength({ min: 1, max: 1000 })
         .withMessage('Message must be between 1 and 1000 characters'),
-    
+
     body('sessionId')
         .optional()
         .isMongoId()
@@ -53,13 +53,13 @@ const validateUserUpdate = [
         .trim()
         .isLength({ min: 2, max: 50 })
         .withMessage('Name must be between 2 and 50 characters'),
-    
+
     body('email')
         .optional()
         .isEmail()
         .normalizeEmail()
         .withMessage('Please provide a valid email address'),
-    
+
     body('role')
         .optional()
         .isIn(['user', 'admin'])

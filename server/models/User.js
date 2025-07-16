@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Name is required'],
         trim: true,
         minlength: [2, 'Name must be at least 2 characters long'],
-        maxlength: [50, 'Name cannot exceed 50 characters']
+        maxlength: [50, 'Name cannot exceed 50 characters'],
     },
     email: {
         type: String,
@@ -15,52 +15,45 @@ const userSchema = new mongoose.Schema({
         unique: true,
         lowercase: true,
         trim: true,
-        match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address']
+        match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address'],
     },
     password: {
         type: String,
         required: [true, 'Password is required'],
-        minlength: [6, 'Password must be at least 6 characters long']
+        minlength: [6, 'Password must be at least 6 characters long'],
     },
     role: {
         type: String,
         enum: ['user', 'admin'],
-        default: 'user'
+        default: 'user',
     },
     isActive: {
         type: Boolean,
-        default: true
+        default: true,
     },
-    isApproved: {
+    isVerified: {
         type: Boolean,
-        default: false
-    },
-    approvedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: null
-    },
-    approvedAt: {
-        type: Date,
-        default: null
+        default: false, // Only true after OTP verification
     },
     lastLogin: {
         type: Date,
-        default: null
+        default: null,
     },
-    refreshTokens: [{
-        token: String,
-        createdAt: {
-            type: Date,
-            default: Date.now,
-            expires: 604800 // 7 days in seconds
-        }
-    }]
+    refreshTokens: [
+        {
+            token: String,
+            createdAt: {
+                type: Date,
+                default: Date.now,
+                expires: 604800, // 7 days
+            },
+        },
+    ],
 }, {
-    timestamps: true
+    timestamps: true,
 });
 
-// Index for faster queries
+// Indexes
 userSchema.index({ email: 1 });
 userSchema.index({ role: 1 });
 
@@ -77,12 +70,12 @@ userSchema.pre('save', async function (next) {
     }
 });
 
-// Method to compare password
+// Compare password
 userSchema.methods.comparePassword = async function (candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Method to remove sensitive data when converting to JSON
+// Remove sensitive data from response
 userSchema.methods.toJSON = function () {
     const user = this.toObject();
     delete user.password;
@@ -90,7 +83,7 @@ userSchema.methods.toJSON = function () {
     return user;
 };
 
-// Static method to find active users
+// Find active users
 userSchema.statics.findActive = function () {
     return this.find({ isActive: true });
 };

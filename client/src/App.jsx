@@ -7,6 +7,7 @@ import Signup from './pages/Signup';
 import Login from './pages/Login';
 import Chat from './pages/Chat';
 import AdminPanel from './pages/AdminPanel';
+import OtpVerification from './components/OtpVerification';
 import { FaBrain } from 'react-icons/fa';
 
 function App() {
@@ -14,10 +15,10 @@ function App() {
 
   if (loading) {
     return (
-      <div style={{ 
-        height: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
         justifyContent: 'center',
         background: '#6366f1',
         color: 'white',
@@ -30,53 +31,59 @@ function App() {
 
   return (
     <Routes>
-      <Route 
-        path="/" 
+      <Route
+        path="/"
         element={
-          isAuthenticated() ? 
-          <Navigate to="/dashboard" replace /> : 
-          <Navigate to="/login" replace />
-        } 
+          isAuthenticated() ?
+            <Navigate to="/dashboard" replace /> :
+            <Navigate to="/login" replace />
+        }
       />
-      <Route 
-        path="/dashboard" 
+      <Route
+        path="/dashboard"
         element={
           <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/signup" 
+      <Route
+        path="/signup"
         element={
-          isAuthenticated() ? 
-          <Navigate to="/dashboard" replace /> : 
-          <Signup />
-        } 
+          isAuthenticated() ?
+            <Navigate to="/dashboard" replace /> :
+            <Signup />
+        }
       />
-      <Route 
-        path="/login" 
+      <Route
+        path="/login"
         element={
-          isAuthenticated() ? 
-          <Navigate to="/dashboard" replace /> : 
-          <Login />
-        } 
+          isAuthenticated() ?
+            <Navigate to="/dashboard" replace /> :
+            <Login />
+        }
       />
-      <Route 
-        path="/chat" 
+      <Route
+        path="/chat"
         element={
           <ProtectedRoute>
             <Chat />
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/admin" 
+      <Route
+        path="/admin"
         element={
           <ProtectedRoute adminOnly={true}>
             <AdminPanel />
           </ProtectedRoute>
-        } 
+        }
+      />
+
+      {/* ✅ OTP Verification Route */}
+      <Route
+        path="/verify-otp"
+        element={<OtpVerification />}
       />
     </Routes>
   );
