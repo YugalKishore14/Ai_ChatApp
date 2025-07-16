@@ -1,0 +1,23 @@
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .header-actions {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        right: 1rem;
+        top: 60px;
+        background: #333;
+        padding: 10px;
+        border-radius: 8px;
+        z-index: 1000;
+    }
+
+    .header-actions.open {
+        display: flex;
+    }
+}

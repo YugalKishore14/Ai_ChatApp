@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Container, Row, Col, Card, Form, Button, Navbar, Nav, Badge, Spinner, InputGroup } from 'react-bootstrap';
-import { FaRobot, FaUser, FaPaperPlane, FaSignOutAlt, FaCog, FaTrash, FaPlus, FaHome, FaBrain, FaMicrophone, FaStop } from 'react-icons/fa';
+import { Container, Row, Col, Form, Button, Spinner, InputGroup } from 'react-bootstrap';
+import { FaRobot, FaUser, FaPaperPlane, FaSignOutAlt, FaCog, FaTrash, FaPlus, FaHome, FaBrain, FaBars } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { chatAPI } from '../services/api';
@@ -17,26 +17,21 @@ const Chat = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const [notification, setNotification] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
     loadChatHistory();
     inputRef.current?.focus();
-
-    // Add chat-active class to body to prevent scrolling
     document.body.classList.add('chat-active');
-
-    // Cleanup function to remove class when component unmounts
     return () => {
       document.body.classList.remove('chat-active');
     };
   }, []);
 
-  // Only scroll when a new message is added, not on every update
   useEffect(() => {
     if (messages.length > 0) {
-      // Small delay to ensure DOM is updated
       setTimeout(() => {
         scrollToBottom();
       }, 100);
@@ -99,7 +94,6 @@ const Chat = () => {
     const words = text.split(' ');
     let currentText = '';
     let wordIndex = 0;
-
     const interval = setInterval(() => {
       if (wordIndex < words.length) {
         currentText += (wordIndex > 0 ? ' ' : '') + words[wordIndex];
@@ -107,7 +101,7 @@ const Chat = () => {
         wordIndex++;
       } else {
         clearInterval(interval);
-        setLoading(false); // Reset loading when done
+        setLoading(false);
       }
     }, 80);
   };
@@ -126,7 +120,6 @@ const Chat = () => {
     setInput('');
     setLoading(true);
 
-    // Add an empty AI message that will be filled gradually
     const aiMessagePlaceholder = {
       role: 'assistant',
       content: '',
@@ -137,12 +130,9 @@ const Chat = () => {
 
     try {
       const response = await chatAPI.sendMessage(userMessage.content, currentSessionId);
-
       if (response.success) {
         setCurrentSessionId(response.sessionId);
         loadChatHistory();
-
-        // Simulate streaming for the AI response without typing indicator
         simulateStreaming(response.aiMessage, (streamedText) => {
           setMessages(prev => prev.map((msg, index) =>
             index === prev.length - 1 ? { ...msg, content: streamedText, isStreaming: streamedText !== response.aiMessage } : msg
@@ -153,7 +143,7 @@ const Chat = () => {
         showNotification('Failed to get AI response', 'error');
       }
     } catch (error) {
-      setMessages(prev => prev.slice(0, -1)); // Remove placeholder
+      setMessages(prev => prev.slice(0, -1));
       showNotification('Failed to send message. Please try again.', 'error');
     } finally {
       setLoading(false);
@@ -166,27 +156,14 @@ const Chat = () => {
 
   return (
     <div className="chat-app">
-      {/* Custom Notification */}
-      {notification && (
-        <div className={`custom-notification ${notification.type}`}>
-          <div className="notification-content">
-            {notification.message}
-          </div>
-        </div>
-      )}
-
-      {/* Modern Header */}
+      {/* Header */}
       <header className="chat-header">
         <Container fluid>
           <Row className="align-items-center">
             <Col>
               <div className="d-flex align-items-center">
-                <Button
-                  variant="link"
-                  className="nav-btn"
-                  onClick={() => navigate('/dashboard')}
-                >
-                  <FaHome />
+                <Button variant="link" className="nav-btn" onClick={() => setSidebarVisible(!sidebarVisible)}>
+                  <FaBars />
                 </Button>
                 <div className="header-logo">
                   <FaBrain className="logo-pulse" />
@@ -216,53 +193,51 @@ const Chat = () => {
       </header>
 
       <div className="chat-container">
-        {/* Enhanced Sidebar */}
-        <div className={`chat-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
-          <div className="sidebar-header">
-            <Button
-              className="new-chat-btn w-100"
-              onClick={startNewChat}
-            >
-              <FaPlus />
-              New Conversation
-            </Button>
-          </div>
-
-          <div className="chat-history">
-            <div className="history-title">Recent Chats</div>
-            {chatHistory.length === 0 ? (
-              <div className="empty-history">
-                <FaRobot className="empty-icon" />
-                <p>No conversations yet</p>
-              </div>
-            ) : (
-              chatHistory.map((session) => (
-                <div
-                  key={session._id}
-                  className={`chat-session-item ${currentSessionId === session._id ? 'active' : ''}`}
-                  onClick={() => loadChatSession(session)}
-                >
-                  <div className="session-title">{session.title}</div>
-                  <div className="session-meta">
-                    <span className="session-time">
-                      {new Date(session.lastActivity || session.createdAt).toLocaleDateString()}
-                    </span>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="delete-session"
-                      onClick={(e) => deleteChatSession(session._id, e)}
-                    >
-                      <FaTrash />
-                    </Button>
-                  </div>
+        {/* Sidebar with hamburger toggle */}
+        {sidebarVisible && (
+          <div className={`chat-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+            <div className="sidebar-header">
+              <Button className="new-chat-btn w-100" onClick={startNewChat}>
+                <FaPlus />
+                New Conversation
+              </Button>
+            </div>
+            <div className="chat-history">
+              <div className="history-title">Recent Chats</div>
+              {chatHistory.length === 0 ? (
+                <div className="empty-history">
+                  <FaRobot className="empty-icon" />
+                  <p>No conversations yet</p>
                 </div>
-              ))
-            )}
+              ) : (
+                chatHistory.map((session) => (
+                  <div
+                    key={session._id}
+                    className={`chat-session-item ${currentSessionId === session._id ? 'active' : ''}`}
+                    onClick={() => loadChatSession(session)}
+                  >
+                    <div className="session-title">{session.title}</div>
+                    <div className="session-meta">
+                      <span className="session-time">
+                        {new Date(session.lastActivity || session.createdAt).toLocaleDateString()}
+                      </span>
+                      <Button
+                        variant="link"
+                        size="sm"
+                        className="delete-session"
+                        onClick={(e) => deleteChatSession(session._id, e)}
+                      >
+                        <FaTrash />
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Main Chat Area */}
+        {/* Main Chat */}
         <div className="chat-main">
           <div className="messages-container">
             {messages.length === 0 ? (
@@ -272,27 +247,9 @@ const Chat = () => {
                   <h3>Ready to chat?</h3>
                   <p>Start a conversation with our YUG-AI. Ask anything!</p>
                   <div className="suggested-prompts">
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => setInput("What can you help me with?")}
-                    >
-                      What can you help me with?
-                    </Button>
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => setInput("Tell me a joke")}
-                    >
-                      Tell me a joke
-                    </Button>
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => setInput("Explain quantum computing")}
-                    >
-                      Explain quantum computing
-                    </Button>
+                    <Button variant="outline-primary" size="sm" onClick={() => setInput("What can you help me with?")}>What can you help me with?</Button>
+                    <Button variant="outline-primary" size="sm" onClick={() => setInput("Tell me a joke")}>Tell me a joke</Button>
+                    <Button variant="outline-primary" size="sm" onClick={() => setInput("Explain quantum computing")}>Explain quantum computing</Button>
                   </div>
                 </div>
               </div>
@@ -302,23 +259,15 @@ const Chat = () => {
                   <div key={index} className={`message-wrapper ${message.role}`}>
                     <div className="message-avatar">
                       {message.role === 'user' ? (
-                        <div className="user-avatar">
-                          {user?.name?.charAt(0).toUpperCase()}
-                        </div>
+                        <div className="user-avatar">{user?.name?.charAt(0).toUpperCase()}</div>
                       ) : (
-                        <div className="ai-avatar">
-                          <FaBrain />
-                        </div>
+                        <div className="ai-avatar"><FaBrain /></div>
                       )}
                     </div>
                     <div className="message-content">
                       <div className="message-header">
-                        <span className="message-sender">
-                          {message.role === 'user' ? user?.name : 'YUG-AI'}
-                        </span>
-                        <span className="message-time">
-                          {formatTime(message.timestamp)}
-                        </span>
+                        <span className="message-sender">{message.role === 'user' ? user?.name : 'YUG-AI'}</span>
+                        <span className="message-time">{formatTime(message.timestamp)}</span>
                       </div>
                       <div className={`message-bubble ${message.role}`}>
                         {message.role === 'assistant' ? (
@@ -326,9 +275,7 @@ const Chat = () => {
                         ) : (
                           message.content
                         )}
-                        {message.isStreaming && (
-                          <span className="cursor-blink">|</span>
-                        )}
+                        {message.isStreaming && <span className="cursor-blink">|</span>}
                       </div>
                     </div>
                   </div>
@@ -338,7 +285,7 @@ const Chat = () => {
             )}
           </div>
 
-          {/* Enhanced Input Area */}
+          {/* Chat Input */}
           <div className="chat-input-container">
             <Form onSubmit={handleSend} className="chat-form">
               <InputGroup className="chat-input-group">
@@ -350,23 +297,13 @@ const Chat = () => {
                   disabled={loading}
                   className="chat-input"
                 />
-                <Button
-                  type="submit"
-                  disabled={!input.trim() || loading}
-                  className="send-btn"
-                >
-                  {loading ? (
-                    <Spinner animation="border" size="sm" />
-                  ) : (
-                    <FaPaperPlane />
-                  )}
+                <Button type="submit" disabled={!input.trim() || loading} className="send-btn">
+                  {loading ? <Spinner animation="border" size="sm" /> : <FaPaperPlane />}
                 </Button>
               </InputGroup>
             </Form>
             <div className="input-footer">
-              <span className="input-hint">
-                Press Enter to send, Shift + Enter for new line
-              </span>
+              <span className="input-hint">Press Enter to send, Shift + Enter for new line</span>
             </div>
           </div>
         </div>
