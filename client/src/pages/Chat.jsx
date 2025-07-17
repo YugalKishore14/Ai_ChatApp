@@ -165,22 +165,22 @@ const Chat = () => {
                 <Button variant="link" className="nav-btn" onClick={() => setSidebarVisible(!sidebarVisible)}>
                   <FaBars />
                 </Button>
-                <div className="header-logo">
-                  <FaBrain className="logo-pulse" />
+                <div className="header-logo d-flex align-items-center ms-2">
+                  <FaBrain className="logo-pulse me-2" />
                   <span className="header-title">YUG-AI</span>
                 </div>
               </div>
             </Col>
             <Col xs="auto">
-              <div className="header-actions">
-                <div className="user-status">
+              <div className="header-actions d-flex align-items-center gap-3">
+                <div className="user-status d-flex align-items-center gap-2">
                   <div className="status-indicator online"></div>
                   <span className="user-name">{user?.name}</span>
                 </div>
                 {isAdmin() && (
-                  <Button className="action-btn admin-btn" onClick={() => navigate('/admin')}>
+                  <Button className="action-btn admin-btn d-flex align-items-center gap-2" onClick={() => navigate('/admin')}>
                     <FaCog />
-                    <span>Admin</span>
+                    <span className="d-none d-sm-inline">Admin</span>
                   </Button>
                 )}
                 <Button className="action-btn logout-btn" onClick={handleLogout}>
@@ -191,6 +191,7 @@ const Chat = () => {
           </Row>
         </Container>
       </header>
+
 
       <div className="chat-container">
         {/* Sidebar with hamburger toggle */}
