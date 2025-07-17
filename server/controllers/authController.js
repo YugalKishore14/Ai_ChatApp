@@ -61,21 +61,8 @@ exports.register = async (req, res) => {
 
         await user.save();
 
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        await Otp.create({
-            email,
-            otp,
-            expiresAt: new Date(Date.now() + 3 * 60 * 1000) // 2 mins
-        });
-
-        await sendEmail(
-            email,
-            'Your OTP Code',
-            `<h1>Your OTP is: ${otp}</h1><p>This OTP is valid for 2 minutes.</p>`
-        );
-
         res.status(201).json({
-            message: 'Account created successfully! OTP sent to your email.',
+            message: 'Account created successfully!',
             email: user.email
         });
 
@@ -84,6 +71,7 @@ exports.register = async (req, res) => {
         res.status(500).json({ message: 'Server error during registration' });
     }
 };
+
 
 // -------------------- LOGIN --------------------
 exports.login = async (req, res) => {

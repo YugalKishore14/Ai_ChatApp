@@ -10,12 +10,12 @@ const createDefaultAdmin = async () => {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
-        
+
         console.log('Connected to MongoDB');
 
         // Check if admin already exists
         const adminExists = await User.findOne({ role: 'admin' });
-        
+
         if (adminExists) {
             console.log('Admin user already exists:', adminExists.email);
             process.exit(0);
@@ -24,20 +24,20 @@ const createDefaultAdmin = async () => {
         // Create default admin
         const defaultAdmin = new User({
             name: 'Admin User',
-            email: 'admin@example.com',
-            password: 'admin123', // Will be hashed automatically by the model
+            email: 'yugaldhiman14@gmail.com',
+            password: 'Admin123', // Will be hashed automatically by the model
             role: 'admin'
         });
 
         await defaultAdmin.save();
-        
+
         console.log('✅ Default admin user created successfully!');
-        console.log('Email: admin@example.com');
+        console.log('Email: yugaldhiman14@gmail.com');
         console.log('Password: admin123');
         console.log('⚠️  Please change the default password after first login!');
-        
+
         process.exit(0);
-        
+
     } catch (error) {
         console.error('❌ Error creating admin user:', error);
         process.exit(1);
