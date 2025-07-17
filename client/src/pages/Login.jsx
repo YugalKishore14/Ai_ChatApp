@@ -102,7 +102,7 @@ const Login = () => {
   };
 
   return (
-    <Container fluid className="min-vh-100 bg-light d-flex align-items-center">
+    <Container fluid className="min-vh-100 bg-light d-flex align-items-center justify-content-center">
       <Row className="w-100 justify-content-center">
         <Col md={6} lg={5} xl={4}>
           <Card className="shadow-lg border-0">
