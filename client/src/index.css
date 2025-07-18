@@ -1555,13 +1555,7 @@ code {
 @media (max-width: 768px) {
 
   .chat-input-container {
-    margin-bottom: auto;
-    padding: 1.5rem 2rem;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    flex-shrink: 0;
-    /* Prevent input area from shrinking */
+    margin-bottom: 8%;
   }
 
 
