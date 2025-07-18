@@ -1555,13 +1555,22 @@ code {
 /* Responsive Improvements */
 @media (max-width: 768px) {
 
-  .session-title {
-    font-size: 0.8rem;
+  .empty-chat-content p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
   }
 
-  .chat-session-item.active {
-    width: 90%;
-    height: 11vh;
+  .suggested-prompts .btn {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.70rem;
+  }
+
+  .suggested-prompts {
+    gap: 0.3rem;
+  }
+
+  .session-title {
+    font-size: 0.8rem;
   }
 
   .form-control {
