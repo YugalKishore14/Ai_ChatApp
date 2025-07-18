@@ -1555,7 +1555,7 @@ code {
 @media (max-width: 768px) {
 
   .form-control {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .input-hint {
