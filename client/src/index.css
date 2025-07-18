@@ -612,7 +612,7 @@ code {
 
 /* Enhanced Alerts */
 .alert {
-  border-radius: var(--border-radius-lg);
+  border-radius: 15px;
   border: 1px solid;
   padding: 1rem 1.25rem;
   margin-bottom: 1rem;
