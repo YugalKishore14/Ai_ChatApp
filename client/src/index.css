@@ -1564,7 +1564,7 @@ code {
   }
 
   .chat-input-container {
-    margin-bottom: 10%;
+    margin-bottom: 7%;
   }
 
   .chat-header {
@@ -2077,7 +2077,7 @@ body.chat-active {
   }
 
   .messages-list {
-    padding-top: 10%;
+    padding-top: 16%;
   }
 
 }
