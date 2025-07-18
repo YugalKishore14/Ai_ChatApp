@@ -730,8 +730,7 @@ code {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 3rem 0;
-  /* ////////////////////////////////////////////////////////////////////////// */
+  padding: 1rem 0;
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
   position: relative;
   z-index: 100;
@@ -1554,6 +1553,18 @@ code {
 
 /* Responsive Improvements */
 @media (max-width: 768px) {
+
+  .chat-header {
+    margin-top: auto;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 0;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 100;
+  }
+
 
   .logout-btn {
     width: 3rem;
