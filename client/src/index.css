@@ -1555,6 +1555,15 @@ code {
 /* Responsive Improvements */
 @media (max-width: 768px) {
 
+  .session-title {
+    font-size: 0.8rem;
+  }
+
+  .chat-session-item.active {
+    width: 90%;
+    height: 11vh;
+  }
+
   .form-control {
     font-size: 12px;
   }
