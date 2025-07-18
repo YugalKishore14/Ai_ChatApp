@@ -1554,10 +1554,13 @@ code {
 /* Responsive Improvements */
 @media (max-width: 768px) {
 
+  .input-hint {
+    display: none;
+  }
+
   .chat-input-container {
     margin-bottom: 8%;
   }
-
 
   .chat-header {
     margin-top: auto;
