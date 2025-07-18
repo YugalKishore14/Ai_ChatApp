@@ -268,6 +268,7 @@ code {
   border-radius: var(--border-radius-lg);
   overflow: hidden;
   min-height: 0;
+  /* padding-top: 80px; */
   /* Ensure flex children can scroll */
 }
 
@@ -1567,13 +1568,14 @@ code {
   }
 
   .chat-header {
+    width: 100%;
     margin-top: auto;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     padding: 1rem 0;
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-    position: relative;
+    position: fixed;
     z-index: 100;
   }
 
@@ -1628,6 +1630,7 @@ code {
 
   .chat-container {
     height: calc(100vh - 80px);
+    padding-top: 80px;
   }
 
   .chat-sidebar {
@@ -2072,4 +2075,9 @@ body.chat-active {
   .user-status {
     gap: 0.25rem;
   }
+
+  .messages-list {
+    padding-top: 5%;
+  }
+
 }
