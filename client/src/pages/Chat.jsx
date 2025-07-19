@@ -338,16 +338,16 @@ const Chat = () => {
                       )}
                     </div>
                     <div className="message-content">
-                      <div className="message-header">
+                      <div className={`message-header ${message.role}`}>
                         {message.role === "user" ? (
                           <>
-                            <span className="message-time">{formatTime(message.timestamp)}</span>
+                            <span className="message-time onetime">{formatTime(message.timestamp)}</span>
                             <span className="message-sender">{user?.name}</span>
                           </>
                         ) : (
                           <>
                             <span className="message-sender">YUG-AI</span>
-                            <span className="message-time">{formatTime(message.timestamp)}</span>
+                            <span className="message-time twotime">{formatTime(message.timestamp)}</span>
                           </>
                         )}
                       </div>
@@ -401,7 +401,7 @@ const Chat = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
