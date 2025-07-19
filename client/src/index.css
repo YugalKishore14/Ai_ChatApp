@@ -1423,7 +1423,7 @@ code {
 
 /* Ensure proper alignment in admin header */
 .admin-header .d-flex.align-items-center.gap-3 {
-  gap: 1rem !important;
+  /* gap: 1rem !important; */
   height: 60px;
   align-items: center;
 }
@@ -1555,8 +1555,15 @@ code {
 
 /* Responsive Improvements */
 @media (max-width: 768px) {
+  .admin-header .d-flex.align-items-center.gap-3 {
+    gap: 1px;
+  }
+
   .logout {
     font-size: 15px;
+
+    width: 2.5rem;
+    height: 2.5rem;
   }
 
   .box-4 {
@@ -1568,7 +1575,7 @@ code {
   }
 
   .header-text-p {
-    font-size: 12px;
+    font-size: 10px;
   }
 
   .admin-panel-title {
