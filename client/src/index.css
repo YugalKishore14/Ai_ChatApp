@@ -1555,7 +1555,9 @@ code {
 
 /* Responsive Improvements */
 @media (max-width: 768px) {
-
+  .new-chat-btn {
+    padding: 5px;
+  }
 
   .onetime {
     margin-left: 15%;
