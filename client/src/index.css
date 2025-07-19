@@ -1630,8 +1630,8 @@ code {
   }
 
   .chat-input-container {
-    margin: auto;
-    padding: 2.5rem 4rem;
+    margin-bottom: auto;
+    padding: 2.5rem 2rem;
   }
 
 
