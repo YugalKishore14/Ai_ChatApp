@@ -1,16 +1,35 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Container, Row, Col, Form, Button, Spinner, InputGroup } from 'react-bootstrap';
-import { FaRobot, FaUser, FaPaperPlane, FaSignOutAlt, FaCog, FaTrash, FaPlus, FaHome, FaBrain, FaBars } from 'react-icons/fa';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { chatAPI } from '../services/api';
-import MarkdownRenderer from '../components/MarkdownRenderer';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  Spinner,
+  InputGroup,
+} from "react-bootstrap";
+import {
+  FaRobot,
+  FaUser,
+  FaPaperPlane,
+  FaSignOutAlt,
+  FaCog,
+  FaTrash,
+  FaPlus,
+  FaHome,
+  FaBrain,
+  FaBars,
+} from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { chatAPI } from "../services/api";
+import MarkdownRenderer from "../components/MarkdownRenderer";
 
 const Chat = () => {
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState(null);
@@ -24,9 +43,9 @@ const Chat = () => {
   useEffect(() => {
     loadChatHistory();
     inputRef.current?.focus();
-    document.body.classList.add('chat-active');
+    document.body.classList.add("chat-active");
     return () => {
-      document.body.classList.remove('chat-active');
+      document.body.classList.remove("chat-active");
     };
   }, []);
 
@@ -42,7 +61,7 @@ const Chat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const showNotification = (message, type = 'info') => {
+  const showNotification = (message, type = "info") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 4000);
   };
@@ -52,13 +71,13 @@ const Chat = () => {
       const response = await chatAPI.getChatHistory();
       setChatHistory(response.sessions || []);
     } catch (error) {
-      showNotification('Failed to load chat history', 'error');
+      showNotification("Failed to load chat history", "error");
     }
   };
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   const startNewChat = () => {
@@ -80,23 +99,23 @@ const Chat = () => {
     e.stopPropagation();
     try {
       await chatAPI.deleteChatSession(sessionId);
-      setChatHistory(prev => prev.filter(s => s._id !== sessionId));
+      setChatHistory((prev) => prev.filter((s) => s._id !== sessionId));
       if (currentSessionId === sessionId) {
         startNewChat();
       }
-      showNotification('Chat session deleted', 'success');
+      showNotification("Chat session deleted", "success");
     } catch (error) {
-      showNotification('Failed to delete chat session', 'error');
+      showNotification("Failed to delete chat session", "error");
     }
   };
 
   const simulateStreaming = (text, callback) => {
-    const words = text.split(' ');
-    let currentText = '';
+    const words = text.split(" ");
+    let currentText = "";
     let wordIndex = 0;
     const interval = setInterval(() => {
       if (wordIndex < words.length) {
-        currentText += (wordIndex > 0 ? ' ' : '') + words[wordIndex];
+        currentText += (wordIndex > 0 ? " " : "") + words[wordIndex];
         callback(currentText);
         wordIndex++;
       } else {
@@ -111,47 +130,61 @@ const Chat = () => {
     if (!input.trim() || loading) return;
 
     const userMessage = {
-      role: 'user',
+      role: "user",
       content: input.trim(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
     setLoading(true);
 
     const aiMessagePlaceholder = {
-      role: 'assistant',
-      content: '',
+      role: "assistant",
+      content: "",
       timestamp: new Date().toISOString(),
-      isStreaming: true
+      isStreaming: true,
     };
-    setMessages(prev => [...prev, aiMessagePlaceholder]);
+    setMessages((prev) => [...prev, aiMessagePlaceholder]);
 
     try {
-      const response = await chatAPI.sendMessage(userMessage.content, currentSessionId);
+      const response = await chatAPI.sendMessage(
+        userMessage.content,
+        currentSessionId
+      );
       if (response.success) {
         setCurrentSessionId(response.sessionId);
         loadChatHistory();
         simulateStreaming(response.aiMessage, (streamedText) => {
-          setMessages(prev => prev.map((msg, index) =>
-            index === prev.length - 1 ? { ...msg, content: streamedText, isStreaming: streamedText !== response.aiMessage } : msg
-          ));
+          setMessages((prev) =>
+            prev.map((msg, index) =>
+              index === prev.length - 1
+                ? {
+                  ...msg,
+                  content: streamedText,
+                  isStreaming: streamedText !== response.aiMessage,
+                }
+                : msg
+            )
+          );
         });
       } else {
-        setMessages(prev => prev.slice(0, -1));
-        showNotification('Failed to get AI response', 'error');
+        setMessages((prev) => prev.slice(0, -1));
+        showNotification("Failed to get AI response", "error");
       }
     } catch (error) {
-      setMessages(prev => prev.slice(0, -1));
-      showNotification('Failed to send message. Please try again.', 'error');
+      setMessages((prev) => prev.slice(0, -1));
+      showNotification("Failed to send message. Please try again.", "error");
     } finally {
       setLoading(false);
     }
   };
 
   const formatTime = (timestamp) => {
-    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return new Date(timestamp).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
@@ -162,7 +195,11 @@ const Chat = () => {
           <Row className="align-items-center">
             <Col>
               <div className="d-flex align-items-center">
-                <Button variant="link" className="nav-btn" onClick={() => setSidebarVisible(!sidebarVisible)}>
+                <Button
+                  variant="link"
+                  className="nav-btn"
+                  onClick={() => setSidebarVisible(!sidebarVisible)}
+                >
                   <FaBars />
                 </Button>
                 <div className="header-logo d-flex align-items-center ms-2">
@@ -178,12 +215,18 @@ const Chat = () => {
                   <span className="user-name">{user?.name}</span>
                 </div>
                 {isAdmin() && (
-                  <Button className="action-btn admin-btn d-flex align-items-center gap-2" onClick={() => navigate('/admin')}>
+                  <Button
+                    className="action-btn admin-btn d-flex align-items-center gap-2"
+                    onClick={() => navigate("/admin")}
+                  >
                     <FaCog />
                     <span className="d-none d-sm-inline">Admin</span>
                   </Button>
                 )}
-                <Button className="action-btn logout-btn" onClick={handleLogout}>
+                <Button
+                  className="action-btn logout-btn"
+                  onClick={handleLogout}
+                >
                   <FaSignOutAlt />
                 </Button>
               </div>
@@ -192,15 +235,16 @@ const Chat = () => {
         </Container>
       </header>
 
-
       <div className="chat-container">
         {/* Sidebar with hamburger toggle */}
         {sidebarVisible && (
-          <div className={`chat-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+          <div
+            className={`chat-sidebar ${sidebarCollapsed ? "collapsed" : ""}`}
+          >
             <div className="sidebar-header">
               <Button className="new-chat-btn w-100" onClick={startNewChat}>
                 <FaPlus />
-                New Conversation
+                New Chat
               </Button>
             </div>
             <div className="chat-history">
@@ -214,13 +258,16 @@ const Chat = () => {
                 chatHistory.map((session) => (
                   <div
                     key={session._id}
-                    className={`chat-session-item ${currentSessionId === session._id ? 'active' : ''}`}
+                    className={`chat-session-item ${currentSessionId === session._id ? "active" : ""
+                      }`}
                     onClick={() => loadChatSession(session)}
                   >
                     <div className="session-title">{session.title}</div>
                     <div className="session-meta">
                       <span className="session-time">
-                        {new Date(session.lastActivity || session.createdAt).toLocaleDateString()}
+                        {new Date(
+                          session.lastActivity || session.createdAt
+                        ).toLocaleDateString()}
                       </span>
                       <Button
                         variant="link"
@@ -248,30 +295,64 @@ const Chat = () => {
                   <h3>Ready to chat?</h3>
                   <p>Start a conversation with our YUG-AI. Ask anything!</p>
                   <div className="suggested-prompts">
-                    <Button variant="outline-primary" size="sm" onClick={() => setInput("What can you help me with?")}>What can you help me with?</Button>
-                    <Button variant="outline-primary" size="sm" onClick={() => setInput("Tell me a joke")}>Tell me a joke</Button>
-                    <Button variant="outline-primary" size="sm" onClick={() => setInput("Explain quantum computing")}>Explain quantum computing</Button>
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      onClick={() => setInput("What can you help me with?")}
+                    >
+                      What can you help me with?
+                    </Button>
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      onClick={() => setInput("Tell me a joke")}
+                    >
+                      Tell me a joke
+                    </Button>
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      onClick={() => setInput("Explain quantum computing")}
+                    >
+                      Explain quantum computing
+                    </Button>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="messages-list">
                 {messages.map((message, index) => (
-                  <div key={index} className={`message-wrapper ${message.role}`}>
+                  <div
+                    key={index}
+                    className={`message-wrapper ${message.role}`}>
+
                     <div className="message-avatar">
-                      {message.role === 'user' ? (
-                        <div className="user-avatar">{user?.name?.charAt(0).toUpperCase()}</div>
+                      {message.role === "user" ? (
+                        <div className="user-avatar">
+                          {user?.name?.charAt(0).toUpperCase()}
+                        </div>
                       ) : (
-                        <div className="ai-avatar"><FaBrain /></div>
+                        <div className="ai-avatar">
+                          <FaBrain />
+                        </div>
                       )}
                     </div>
                     <div className="message-content">
                       <div className="message-header">
-                        <span className="message-sender">{message.role === 'user' ? user?.name : 'YUG-AI'}</span>
-                        <span className="message-time">{formatTime(message.timestamp)}</span>
+                        {message.role === "user" ? (
+                          <>
+                            <span className="message-time">{formatTime(message.timestamp)}</span>
+                            <span className="message-sender">{user?.name}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="message-sender">YUG-AI</span>
+                            <span className="message-time">{formatTime(message.timestamp)}</span>
+                          </>
+                        )}
                       </div>
                       <div className={`message-bubble ${message.role}`}>
-                        {message.role === 'assistant' ? (
+                        {message.role === "assistant" ? (
                           <MarkdownRenderer content={message.content} />
                         ) : (
                           message.content
@@ -279,6 +360,7 @@ const Chat = () => {
                         {message.isStreaming && <span className="cursor-blink">|</span>}
                       </div>
                     </div>
+
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
@@ -298,13 +380,23 @@ const Chat = () => {
                   disabled={loading}
                   className="chat-input"
                 />
-                <Button type="submit" disabled={!input.trim() || loading} className="send-btn">
-                  {loading ? <Spinner animation="border" size="sm" /> : <FaPaperPlane />}
+                <Button
+                  type="submit"
+                  disabled={!input.trim() || loading}
+                  className="send-btn"
+                >
+                  {loading ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : (
+                    <FaPaperPlane />
+                  )}
                 </Button>
               </InputGroup>
             </Form>
             <div className="input-footer">
-              <span className="input-hint">Press Enter to send, Shift + Enter for new line</span>
+              <span className="input-hint">
+                Press Enter to send, Shift + Enter for new line
+              </span>
             </div>
           </div>
         </div>

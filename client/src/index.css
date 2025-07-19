@@ -1074,7 +1074,7 @@ code {
   gap: 1rem;
   animation: messageAppear 0.4s ease-out;
   margin-bottom: 1rem;
-  max-width: 85%;
+  max-width: 100%;
   /* Prevent messages from taking full width */
 }
 
@@ -1157,7 +1157,7 @@ code {
 .message-bubble.user {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
   color: white;
-  border-bottom-right-radius: 0.5rem;
+  border-radius: 1.5rem;
 }
 
 .message-bubble.assistant {
@@ -1555,6 +1555,15 @@ code {
 /* Responsive Improvements */
 @media (max-width: 768px) {
 
+  .sidebar-header {
+    margin-top: auto;
+  }
+
+  .message-bubble.user {
+    border-radius: 1.5rem;
+    margin-left: 6%;
+  }
+
   .empty-chat-content p {
     font-size: 1rem;
     margin-bottom: 1rem;
@@ -1583,7 +1592,7 @@ code {
 
   .chat-input-container {
     margin: auto;
-    padding: 2.5rem 3rem;
+    padding: 2.5rem 4rem;
   }
 
 
@@ -1667,16 +1676,16 @@ code {
   }
 
   .message-wrapper {
-    max-width: 95%;
+    max-width: 100%;
     /* More width on mobile */
   }
 
-  .message-wrapper.user {
+  /* .message-wrapper.user {
     margin-left: auto;
     margin-right: 0.5rem;
-  }
+  } */
 
-  .message-wrapper.assistant {
+  .assistant {
     margin-right: auto;
     margin-left: 0.5rem;
   }
@@ -2049,6 +2058,11 @@ body.chat-active {
 }
 
 @media (max-width: 768px) {
+
+  .message-avatar {
+    display: none;
+  }
+
   .message-bubble.assistant {
     font-size: 0.875rem;
   }
