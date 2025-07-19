@@ -1555,6 +1555,17 @@ code {
 
 /* Responsive Improvements */
 @media (max-width: 768px) {
+
+  .admin-header .logo-container {
+    width: 40px;
+    height: 40px;
+  }
+
+  .logoutbtn-box {
+    width: 40px;
+    height: 40px;
+  }
+
   .admin-header .d-flex.align-items-center.gap-3 {
     gap: 1px;
   }
@@ -1583,7 +1594,7 @@ code {
   }
 
   .modern-btn {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .header-text {
