@@ -255,8 +255,8 @@ const AdminPanel = () => {
                 <div
                   key={index}
                   className={`mb-2 p-2 rounded ${message.role === "user"
-                    ? "bg-primary text-white"
-                    : "bg-light"
+                      ? "bg-primary text-white"
+                      : "bg-light"
                     }`}
                 >
                   <div className="fw-bold">
@@ -328,14 +328,17 @@ const AdminPanel = () => {
                 </div>
                 <div className="ms-3">
                   <h4 className="mb-0 brand-text">Admin Panel</h4>
-                  <small style={{ color: "rgba(255, 255, 255, 0.8)" }}>
+                  <small
+                    className="header-text"
+                    style={{ color: "rgba(255, 255, 255, 0.8)" }}
+                  >
                     System Management
                   </small>
                 </div>
               </div>
             </Col>
             <Col xs="auto">
-              <div className="d-flex align-items-center gap-3">
+              <div className="d-flex align-items-center gap-3 dashbord-button">
                 <div className="user-info">
                   <div className="user-avatar">
                     {user?.name?.charAt(0).toUpperCase()}
@@ -372,15 +375,16 @@ const AdminPanel = () => {
           <Col>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                <h2 className="mb-0">
+                <h2 className="mb-0 admin-panel-title">
                   <FaUserShield className="me-2 text-primary" />
                   Admin Panel
                 </h2>
-                <p className="text-muted mb-0">
+                <p className="text-muted mb-0 header-text-p">
                   Manage users and monitor chat activity
                 </p>
               </div>
               <Button
+                className="back-to-chat-btn"
                 variant="outline-primary"
                 onClick={() => navigate("/chat")}
               >
@@ -393,7 +397,7 @@ const AdminPanel = () => {
 
         {/* Stats Cards */}
         <Row className="mb-4">
-          <Col md={6} lg={3}>
+          <Col md={6} lg={3} className="box-4">
             <Card className="text-center h-100">
               <Card.Body>
                 <FaUsers size={40} className="text-primary mb-2" />
@@ -402,7 +406,7 @@ const AdminPanel = () => {
               </Card.Body>
             </Card>
           </Col>
-          <Col md={6} lg={3}>
+          <Col md={6} lg={3} className="box-4">
             <Card className="text-center h-100">
               <Card.Body>
                 <FaComments size={40} className="text-success mb-2" />
@@ -411,7 +415,7 @@ const AdminPanel = () => {
               </Card.Body>
             </Card>
           </Col>
-          <Col md={6} lg={3}>
+          <Col md={6} lg={3} className="box-4">
             <Card className="text-center h-100">
               <Card.Body>
                 <FaUserShield size={40} className="text-warning mb-2" />
@@ -422,7 +426,7 @@ const AdminPanel = () => {
               </Card.Body>
             </Card>
           </Col>
-          <Col md={6} lg={3}>
+          <Col md={6} lg={3} className="box-4">
             <Card className="text-center h-100">
               <Card.Body>
                 <FaDownload size={40} className="text-info mb-2" />
@@ -515,10 +519,21 @@ const AdminPanel = () => {
 
               {/* Users Tab */}
               <Tab eventKey="users" title="Users Management">
-                <div className="table-responsive">
-                  <Table striped hover>
-                    <thead>
-                      <tr>
+                <div
+                  className="table-responsive"
+                  style={{
+                    overflowX: "auto",
+                    WebkitOverflowScrolling: "touch",
+                  }}
+                >
+                  <Table
+                    striped
+                    hover
+                    className="table-sm text-nowrap"
+                    style={{ minWidth: "600px" }}
+                  >
+                    <thead className="table-light">
+                      <tr style={{ fontSize: "14px" }}>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Role</th>
@@ -528,9 +543,8 @@ const AdminPanel = () => {
                     </thead>
                     <tbody>
                       {users.map((user) => (
-                        <tr key={user._id}>
+                        <tr key={user._id} style={{ fontSize: "13px" }}>
                           <td>
-                            {" "}
                             <strong>{user.name}</strong>
                           </td>
                           <td>{user.email}</td>
@@ -539,6 +553,8 @@ const AdminPanel = () => {
                               bg={
                                 user.role === "admin" ? "primary" : "secondary"
                               }
+                              className="px-2 py-1"
+                              style={{ fontSize: "11px" }}
                             >
                               {user.role}
                             </Badge>
@@ -551,15 +567,10 @@ const AdminPanel = () => {
                               variant="outline-primary"
                               size="sm"
                               className="me-2"
-                              onClick={() => openUserModal(user)}
                             >
                               <FaEdit />
                             </Button>
-                            <Button
-                              variant="outline-danger"
-                              size="sm"
-                              onClick={() => handleDeleteUser(user._id)}
-                            >
+                            <Button variant="outline-danger" size="sm">
                               <FaTrash />
                             </Button>
                           </td>
@@ -572,10 +583,21 @@ const AdminPanel = () => {
 
               {/* Chat History Tab */}
               <Tab eventKey="chats" title="Chat History">
-                <div className="table-responsive">
-                  <Table striped hover>
-                    <thead>
-                      <tr>
+                <div
+                  className="table-responsive"
+                  style={{
+                    overflowX: "auto",
+                    WebkitOverflowScrolling: "touch",
+                  }}
+                >
+                  <Table
+                    striped
+                    hover
+                    className="table-sm text-nowrap"
+                    style={{ minWidth: "600px" }}
+                  >
+                    <thead className="table-light">
+                      <tr style={{ fontSize: "14px" }}>
                         <th>User</th>
                         <th>Messages</th>
                         <th>Created</th>
@@ -585,7 +607,7 @@ const AdminPanel = () => {
                     </thead>
                     <tbody>
                       {chatHistory.map((chat) => (
-                        <tr key={chat._id}>
+                        <tr key={chat._id} style={{ fontSize: "13px" }}>
                           <td>
                             <strong>
                               {chat.userId?.name || "Unknown User"}
@@ -596,7 +618,11 @@ const AdminPanel = () => {
                             </small>
                           </td>
                           <td>
-                            <Badge bg="info">
+                            <Badge
+                              bg="info"
+                              className="px-2 py-1"
+                              style={{ fontSize: "11px" }}
+                            >
                               {chat.messages?.length || 0} messages
                             </Badge>
                           </td>
@@ -610,6 +636,7 @@ const AdminPanel = () => {
                             <Button
                               variant="outline-primary"
                               size="sm"
+                              className="px-2 py-1"
                               onClick={() => openChatModal(chat)}
                             >
                               <FaEye />

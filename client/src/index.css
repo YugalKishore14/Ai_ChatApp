@@ -1555,16 +1555,50 @@ code {
 
 /* Responsive Improvements */
 @media (max-width: 768px) {
+  .box-4 {
+    margin-bottom: 3%;
+  }
+
+  .back-to-chat-btn {
+    font-size: 12px;
+  }
+
+  .header-text-p {
+    font-size: 12px;
+  }
+
+  .admin-panel-title {
+    font-size: 16px;
+  }
+
+  .modern-btn {
+    font-size: small;
+  }
+
+  .header-text {
+    font-size: 10px;
+  }
+
+  .brand-text {
+    font-size: small;
+  }
+
+  .message-sender {
+    display: none;
+  }
+
   .new-chat-btn {
     padding: 5px;
   }
 
   .onetime {
-    margin-left: 15%;
+    /* margin-left: 15%; */
+    display: none;
   }
 
   .twotime {
-    margin-right: 6%;
+    /* margin-right: 6%; */
+    display: none;
   }
 
   .chat-container {
@@ -1599,7 +1633,7 @@ code {
   }
 
   .message-bubble.user {
-    border-radius: 1.5rem;
+    border-radius: 1rem;
     margin-left: 6%;
   }
 
