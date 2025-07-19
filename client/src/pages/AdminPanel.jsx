@@ -358,7 +358,8 @@ const AdminPanel = () => {
                 </Button>
                 <Button
                   variant="outline-secondary"
-                  className="logout-btn logoutbtn-box"
+                  className="logout-btn"
+                  id="logout-button"
                   onClick={handleLogout}
                   title="Logout"
                 >

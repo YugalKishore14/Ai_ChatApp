@@ -1555,6 +1555,10 @@ code {
 
 /* Responsive Improvements */
 @media (max-width: 768px) {
+  #logout-button {
+    width: 35px;
+    height: 35px;
+  }
 
   .admin-header .logo-container {
     width: 40px;
