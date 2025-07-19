@@ -255,8 +255,8 @@ const AdminPanel = () => {
                 <div
                   key={index}
                   className={`mb-2 p-2 rounded ${message.role === "user"
-                      ? "bg-primary text-white"
-                      : "bg-light"
+                    ? "bg-primary text-white"
+                    : "bg-light"
                     }`}
                 >
                   <div className="fw-bold">
@@ -362,7 +362,7 @@ const AdminPanel = () => {
                   onClick={handleLogout}
                   title="Logout"
                 >
-                  <FaArrowLeft />
+                  <FaArrowLeft className="logout" />
                 </Button>
               </div>
             </Col>

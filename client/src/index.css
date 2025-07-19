@@ -1555,6 +1555,10 @@ code {
 
 /* Responsive Improvements */
 @media (max-width: 768px) {
+  .logout {
+    font-size: 15px;
+  }
+
   .box-4 {
     margin-bottom: 3%;
   }
@@ -1572,7 +1576,7 @@ code {
   }
 
   .modern-btn {
-    font-size: small;
+    font-size: 11px;
   }
 
   .header-text {
