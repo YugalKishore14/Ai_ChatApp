@@ -1690,7 +1690,7 @@ code {
   }
 
   .chat-input-container {
-    margin-bottom: auto;
+    margin-bottom: 4%;
     padding: 2.5rem 2rem;
   }
 
@@ -1865,8 +1865,8 @@ body.chat-active {
 /* Improve message bubble sizing */
 .message-bubble {
   width: fit-content;
-  min-width: 50px;
-  max-width: calc(100% - 1rem);
+  min-width: auto;
+  /* max-width: calc(100% - 1rem); */
 }
 
 .message-content {
@@ -1954,6 +1954,7 @@ body.chat-active {
 /* Markdown Rendering Styles for AI Messages */
 .message-bubble.assistant {
   /* Ensure proper spacing and typography for markdown content */
+  border-radius: 25px;
   line-height: 1.6;
   word-wrap: break-word;
   overflow-wrap: break-word;

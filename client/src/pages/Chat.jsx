@@ -341,16 +341,20 @@ const Chat = () => {
                       <div className={`message-header ${message.role}`}>
                         {message.role === "user" ? (
                           <>
-                            <span className="message-time onetime">{formatTime(message.timestamp)}</span>
-                            <span className="message-sender">{user?.name}</span>
+                            <span
+                              className="message-sender"
+                              style={{ marginLeft: "auto", fontWeight: "600", fontSize: "0.85rem", }}
+                            >
+                              {user?.name}
+                            </span>
                           </>
                         ) : (
                           <>
                             <span className="message-sender">YUG-AI</span>
-                            <span className="message-time twotime">{formatTime(message.timestamp)}</span>
                           </>
                         )}
                       </div>
+
                       <div className={`message-bubble ${message.role}`}>
                         {message.role === "assistant" ? (
                           <MarkdownRenderer content={message.content} />
