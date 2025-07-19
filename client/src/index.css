@@ -1582,8 +1582,10 @@ code {
   }
 
   .chat-input-container {
-    margin-bottom: 6%;
+    margin: auto;
+    padding: 2.5rem 3rem;
   }
+
 
   .chat-header {
     width: 100%;
