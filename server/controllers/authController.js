@@ -129,6 +129,11 @@ exports.verifyOtp = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
+
+        record.used = true;
+        await record.save();
+
+
         user.isVerified = true;
         user.lastLogin = new Date();
 

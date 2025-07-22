@@ -18,6 +18,10 @@ const otpSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    used: {
+        type: Boolean,
+        default: false // OTP initially unused
     }
 });
 
