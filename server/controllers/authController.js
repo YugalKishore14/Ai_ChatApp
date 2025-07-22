@@ -1,7 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
-const bcrypt = require('bcrypt');
 const Otp = require('../models/otp.model');
 const { sendEmail } = require('../services/email.service');
 
@@ -56,13 +55,15 @@ exports.register = async (req, res) => {
         const user = new User({
             name: name.trim(),
             email: email.toLowerCase().trim(),
-            password
+            password,
+            isVerified: true, // Email verification removed, default to verified
+            isActive: true
         });
 
         await user.save();
 
         res.status(201).json({
-            message: 'Account created successfully!',
+            message: 'Account created successfully! You can now log in.',
             email: user.email
         });
 
@@ -72,8 +73,7 @@ exports.register = async (req, res) => {
     }
 };
 
-
-// -------------------- LOGIN --------------------
+// -------------------- LOGIN (Send OTP) --------------------
 exports.login = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -90,15 +90,17 @@ exports.login = async (req, res) => {
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         await Otp.create({
-            email,
+            email: email.toLowerCase().trim(),
             otp,
-            expiresAt: new Date(Date.now() + 2 * 60 * 1000)
+            expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+            used: false,
+            resend: false
         });
 
         await sendEmail(
             email,
             'Your OTP Code',
-            `<h1>Your OTP is: ${otp}</h1><p>This OTP is valid for 2 minutes.</p>`
+            `<h1>Your OTP is: ${otp}</h1><p>This OTP is valid for 5 minutes.</p>`
         );
 
         return res.status(200).json({ message: 'OTP sent to your email', email });
@@ -114,29 +116,22 @@ exports.verifyOtp = async (req, res) => {
     const { email, otp } = req.body;
 
     try {
-        const record = await Otp.findOne({ email, otp });
-
-        if (!record) {
-            return res.status(400).json({ message: 'Invalid OTP' });
-        }
+        const record = await Otp.findOne({ email: email.toLowerCase().trim(), otp, used: false }).sort({ createdAt: -1 });
+        if (!record) return res.status(400).json({ message: 'Invalid OTP' });
 
         if (record.expiresAt < new Date()) {
             return res.status(400).json({ message: 'OTP expired' });
         }
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email.toLowerCase().trim() });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-
         record.used = true;
         await record.save();
 
-
-        user.isVerified = true;
         user.lastLogin = new Date();
-
         const { accessToken, refreshToken } = generateTokens(user);
         user.refreshTokens.push({ token: refreshToken });
         if (user.refreshTokens.length > 5) {
@@ -158,24 +153,43 @@ exports.verifyOtp = async (req, res) => {
     }
 };
 
-// -------------------- EMAIL VERIFY --------------------
-exports.verifyEmail = async (req, res) => {
-    const token = req.params.token;
-
+// -------------------- RESEND OTP --------------------
+exports.resendOtp = async (req, res) => {
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        const user = await User.findById(decoded.id);
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ message: 'Email is required' });
 
+        const normalizedEmail = email.toLowerCase().trim();
+
+        const user = await User.findOne({ email: normalizedEmail });
         if (!user) return res.status(404).json({ message: 'User not found' });
 
-        user.isVerified = true;
-        await user.save();
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        res.redirect('http://localhost:3000/login');
+        const newOtp = await Otp.create({
+            email: normalizedEmail,
+            otp,
+            expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+            used: false,
+            resend: true,
+            createdAt: new Date()
+        });
+
+        await sendEmail(
+            normalizedEmail,
+            'Your OTP Code (Resent)',
+            `<h1>Your new OTP is: ${otp}</h1><p>This OTP is valid for 5 minutes.</p>`
+        );
+
+        return res.status(200).json({
+            message: 'New OTP sent to your email',
+            email: normalizedEmail,
+            otpId: newOtp._id
+        });
 
     } catch (error) {
-        console.error('Email Verification Error:', error);
-        return res.status(400).json({ message: 'Invalid or expired token' });
+        console.error('Resend OTP Error:', error);
+        return res.status(500).json({ message: 'Server error while resending OTP' });
     }
 };
 

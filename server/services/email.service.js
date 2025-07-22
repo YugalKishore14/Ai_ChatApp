@@ -1,7 +1,6 @@
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 require('dotenv').config();
 
-
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
 const apiKey = defaultClient.authentications['api-key'];
 apiKey.apiKey = process.env.BREVO_API_KEY;
@@ -13,14 +12,15 @@ exports.sendEmail = async (to, subject, html) => {
 
     sendSmtpEmail.subject = subject;
     sendSmtpEmail.htmlContent = html;
-    sendSmtpEmail.sender = { name: 'YUG-AI', email: 'yugaldhiman14@gmail.com' }; // ✅ change this
+    sendSmtpEmail.sender = { name: 'YUG-AI', email: 'yugaldhiman14@gmail.com' };
     sendSmtpEmail.to = [{ email: to }];
 
     try {
         const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
-        console.log('Email sent successfully:', data.messageId);
+        console.log('Email sent successfully:', data.messageId || data);
+        return data;
     } catch (error) {
-        console.error('Brevo Email Error:', error.message);
+        console.error('Brevo Email Error Details:', error.response?.body || error.message || error);
         throw new Error('Email sending failed');
     }
 };

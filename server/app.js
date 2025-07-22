@@ -47,12 +47,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   // Remove the upgrade-insecure-requests directive that's causing issues
   // res.setHeader('Content-Security-Policy', "upgrade-insecure-requests");
-  
+
   // Add headers to handle mixed content
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
-  
+
   next();
 });
 
@@ -82,21 +82,21 @@ app.use(express.static(path.join(__dirname, '../client/dist'), {
 // Serve React app for all non-API routes with protocol handling
 app.get('*', (req, res) => {
   const indexPath = path.join(__dirname, '../client/dist/index.html');
-  
+
   // Read the HTML file and modify protocol if needed
   let html = fs.readFileSync(indexPath, 'utf8');
-  
+
   // Replace ALL https:// references with http:// for the current server
   const protocol = req.secure ? 'https' : 'http';
   const serverUrl = `${protocol}://${req.get('host')}`;
-  
+
   // Replace any https references to this domain
   html = html.replace(/https:\/\/34\.42\.233\.32:5000/g, `http://34.42.233.32:5000`);
   html = html.replace(/https:\/\/([^\/]*):5000/g, `http://$1:5000`);
-  
+
   // Also replace relative protocol references
   html = html.replace(/\/\/34\.42\.233\.32:5000/g, `//34.42.233.32:5000`);
-  
+
   res.setHeader('Content-Type', 'text/html');
   res.send(html);
 });
@@ -104,7 +104,7 @@ app.get('*', (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
+  res.status(500).json({
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
   });
@@ -115,8 +115,8 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('MongoDB connected successfully'))
-.catch((err) => console.error('MongoDB connection error:', err));
+  .then(() => console.log('MongoDB connected successfully'))
+  .catch((err) => console.error('MongoDB connection error:', err));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

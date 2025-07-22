@@ -72,6 +72,11 @@ export const authAPI = {
     const response = await api.get('/auth/profile');
     return response.data;
   },
+
+  resendOtp: async (data) => {
+    const response = await api.post('/auth/resend-otp', data);
+    return response.data;
+  },
 };
 
 // ============================

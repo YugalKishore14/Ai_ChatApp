@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   Container,
   Row,
@@ -326,15 +327,19 @@ const AdminPanel = () => {
                 <div className="logo-container">
                   <FaBrain className="logo-icon" />
                 </div>
-                <div className="ms-3">
-                  <h4 className="mb-0 brand-text">Admin Panel</h4>
-                  <small
-                    className="header-text"
-                    style={{ color: "rgba(255, 255, 255, 0.8)" }}
-                  >
-                    System Management
-                  </small>
-                </div>
+
+                <Link to="/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
+                  <div className="ms-3">
+                    <h4 className="mb-0 brand-text">Admin Panel</h4>
+                    <small
+                      className="header-text"
+                      style={{ color: "rgba(255, 255, 255, 0.8)" }}
+                    >
+                      System Management
+                    </small>
+                  </div>
+                </Link>
+
               </div>
             </Col>
             <Col xs="auto">

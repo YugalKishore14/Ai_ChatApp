@@ -13,7 +13,7 @@ const otpSchema = new mongoose.Schema({
     },
     expiresAt: {
         type: Date,
-        required: true
+        required: true // 5-min validity ke liye store hoga
     },
     createdAt: {
         type: Date,
@@ -22,6 +22,10 @@ const otpSchema = new mongoose.Schema({
     used: {
         type: Boolean,
         default: false // OTP initially unused
+    },
+    resend: {
+        type: Boolean,
+        default: false // agar resend OTP hai toh true hoga
     }
 });
 

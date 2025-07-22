@@ -21,13 +21,22 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [statusMessage, setStatusMessage] = useState(location.state?.message || null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [resendTimer, setResendTimer] = useState(0);
 
   useEffect(() => {
     if (location.state?.message) {
       setStatusMessage(location.state.message);
-      window.history.replaceState({}, document.title); // clear message from history
+      window.history.replaceState({}, document.title);
     }
   }, [location.state]);
+
+  useEffect(() => {
+    let timer;
+    if (resendTimer > 0) {
+      timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendTimer]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,17 +48,14 @@ const Login = () => {
 
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Invalid email format';
     }
-
     if (!formData.password && !otpSent) {
       newErrors.password = 'Password is required';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -67,10 +73,10 @@ const Login = () => {
         password: formData.password
       });
 
-      // OTP sent if credentials were valid
       if (res.message === 'OTP sent to your email') {
         setOtpSent(true);
         setStatusMessage('OTP sent to your email');
+        setResendTimer(30); // 30 sec cooldown for resend
       }
     } catch (error) {
       const msg = error.response?.data?.message || 'Login failed';
@@ -100,6 +106,25 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  const handleResendOtp = async () => {
+    if (resendTimer > 0) return;
+
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const res = await authAPI.resendOtp({ email: formData.email.trim().toLowerCase() });
+      setStatusMessage(res.message || 'OTP resent successfully');
+      setErrorMessage(null); // Clear error
+      setResendTimer(30);
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Failed to resend OTP';
+      setErrorMessage(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <Container fluid className="min-vh-100 bg-light d-flex align-items-center justify-content-center">
@@ -184,20 +209,33 @@ const Login = () => {
 
                 {/* OTP */}
                 {otpSent && (
-                  <Form.Group className="mb-4">
-                    <Form.Label className="fw-semibold">
-                      <FaLock className="me-2" /> Enter OTP
-                    </Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="otp"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      placeholder="Enter 6-digit OTP"
-                      className="py-2"
-                      maxLength={6}
-                    />
-                  </Form.Group>
+                  <>
+                    <Form.Group className="mb-3">
+                      <Form.Label className="fw-semibold">
+                        <FaLock className="me-2" /> Enter OTP
+                      </Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="otp"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        placeholder="Enter 6-digit OTP"
+                        className="py-2"
+                        maxLength={6}
+                      />
+                    </Form.Group>
+
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                      <Button
+                        variant="link"
+                        className="p-0 text-decoration-none"
+                        onClick={handleResendOtp}
+                        disabled={loading || resendTimer > 0}
+                      >
+                        {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : 'Resend OTP'}
+                      </Button>
+                    </div>
+                  </>
                 )}
 
                 <Button

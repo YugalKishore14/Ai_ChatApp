@@ -6,7 +6,8 @@ const {
     logout,
     getProfile,
     verifyEmail,
-    verifyOtp
+    verifyOtp,
+    resendOtp
 } = require('../controllers/authController');
 const { verifyToken } = require('../middlewares/verifyToken');
 const {
@@ -25,7 +26,7 @@ router.post('/register', validateRegister, register);
 // @route   GET /api/auth/verify/:token
 // @desc    Verify email via token link
 // @access  Public
-router.get('/verify/:token', verifyEmail);
+// router.get('/verify/:token', verifyEmail);
 
 // @route   POST /api/auth/login
 // @desc    Login user
@@ -51,5 +52,8 @@ router.post('/logout', verifyToken, logout);
 // @desc    Get user profile
 // @access  Private
 router.get('/profile', verifyToken, getProfile);
+
+// New resend OTP route
+router.post('/resend-otp', resendOtp);
 
 module.exports = router;

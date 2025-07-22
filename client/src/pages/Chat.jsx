@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import {
   Container,
   Row,
@@ -202,10 +203,12 @@ const Chat = () => {
                 >
                   <FaBars />
                 </Button>
-                <div className="header-logo d-flex align-items-center ms-2">
-                  <FaBrain className="logo-pulse me-2" />
-                  <span className="header-title">YUG-AI</span>
-                </div>
+                <Link to="/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
+                  <div className="header-logo d-flex align-items-center ms-2">
+                    <FaBrain className="logo-pulse me-2" />
+                    <span className="header-title">YUG-AI</span>
+                  </div>
+                </Link>
               </div>
             </Col>
             <Col xs="auto">
