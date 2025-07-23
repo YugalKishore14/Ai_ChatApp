@@ -80,13 +80,16 @@ const Chat = () => {
     logout();
     navigate("/login");
   };
+  const isMobile = () => window.innerWidth <= 768; // 768px ya mobile screen size
 
   const startNewChat = () => {
     setMessages([]);
     setCurrentSessionId(null);
     setIsTyping(false);
     setLoading(false);
+    setSidebarVisible(false);
     inputRef.current?.focus();
+    if (isMobile()) setSidebarVisible(false);
   };
 
   const loadChatSession = (session) => {
@@ -94,7 +97,25 @@ const Chat = () => {
     setCurrentSessionId(session._id);
     setIsTyping(false);
     setLoading(false);
+    setSidebarVisible(false);
+    if (isMobile()) setSidebarVisible(false);
   };
+
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (
+        sidebarVisible &&
+        !e.target.closest(".chat-sidebar") &&
+        !e.target.closest(".nav-btn") &&
+        isMobile() // auto close only on mobile
+      ) {
+        setSidebarVisible(false);
+      }
+    };
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
+  }, [sidebarVisible]);
 
   const deleteChatSession = async (sessionId, e) => {
     e.stopPropagation();
@@ -203,7 +224,10 @@ const Chat = () => {
                 >
                   <FaBars />
                 </Button>
-                <Link to="/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
+                <Link
+                  to="/dashboard"
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
                   <div className="header-logo d-flex align-items-center ms-2">
                     <FaBrain className="logo-pulse me-2" />
                     <span className="header-title">YUG-AI</span>
@@ -327,8 +351,8 @@ const Chat = () => {
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`message-wrapper ${message.role}`}>
-
+                    className={`message-wrapper ${message.role}`}
+                  >
                     <div className="message-avatar">
                       {message.role === "user" ? (
                         <div className="user-avatar">
@@ -346,7 +370,11 @@ const Chat = () => {
                           <>
                             <span
                               className="message-sender"
-                              style={{ marginLeft: "auto", fontWeight: "600", fontSize: "0.85rem", }}
+                              style={{
+                                marginLeft: "auto",
+                                fontWeight: "600",
+                                fontSize: "0.85rem",
+                              }}
                             >
                               {user?.name}
                             </span>
@@ -364,10 +392,11 @@ const Chat = () => {
                         ) : (
                           message.content
                         )}
-                        {message.isStreaming && <span className="cursor-blink">|</span>}
+                        {message.isStreaming && (
+                          <span className="cursor-blink">|</span>
+                        )}
                       </div>
                     </div>
-
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
@@ -408,7 +437,7 @@ const Chat = () => {
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 
