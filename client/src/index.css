@@ -2211,6 +2211,7 @@ body.chat-active {
   }
 
   .messages-list {
+    gap: 0;
     padding-top: 16%;
   }
 

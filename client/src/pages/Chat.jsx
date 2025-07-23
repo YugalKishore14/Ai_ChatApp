@@ -108,14 +108,20 @@ const Chat = () => {
         sidebarVisible &&
         !e.target.closest(".chat-sidebar") &&
         !e.target.closest(".nav-btn") &&
-        isMobile() // auto close only on mobile
+        isMobile()
       ) {
         setSidebarVisible(false);
       }
     };
-    document.addEventListener("click", handleOutsideClick);
-    return () => document.removeEventListener("click", handleOutsideClick);
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
   }, [sidebarVisible]);
+
 
   const deleteChatSession = async (sessionId, e) => {
     e.stopPropagation();
