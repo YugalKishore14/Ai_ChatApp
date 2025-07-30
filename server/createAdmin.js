@@ -33,7 +33,7 @@ const createDefaultAdmin = async () => {
 
         console.log('✅ Default admin user created successfully!');
         console.log('Email: yugaldhiman14@gmail.com');
-        console.log('Password: admin123');
+        console.log('Password: Admin123');
         console.log('⚠️  Please change the default password after first login!');
 
         process.exit(0);
