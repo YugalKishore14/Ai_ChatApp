@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Container,
   Row,
@@ -22,13 +22,13 @@ import {
   FaBars,
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { chatAPI } from "../services/api";
 import MarkdownRenderer from "../components/MarkdownRenderer";
 
 const Chat = () => {
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
+
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,8 +38,10 @@ const Chat = () => {
   const [notification, setNotification] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
+
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const chatContainerRef = useRef(null); // NEW
 
   useEffect(() => {
     loadChatHistory();
@@ -62,6 +64,15 @@ const Chat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const scrollToTop = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
+
   const showNotification = (message, type = "info") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 4000);
@@ -80,7 +91,8 @@ const Chat = () => {
     logout();
     navigate("/login");
   };
-  const isMobile = () => window.innerWidth <= 768; // 768px ya mobile screen size
+
+  const isMobile = () => window.innerWidth <= 768;
 
   const startNewChat = () => {
     setMessages([]);
@@ -101,14 +113,13 @@ const Chat = () => {
     if (isMobile()) setSidebarVisible(false);
   };
 
-
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (
         sidebarVisible &&
         !e.target.closest(".chat-sidebar") &&
         !e.target.closest(".nav-btn") &&
-        isMobile() // auto close only on mobile
+        isMobile()
       ) {
         setSidebarVisible(false);
       }
@@ -158,6 +169,7 @@ const Chat = () => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    scrollToTop(); // <-- NEW
     setInput("");
     setLoading(true);
 
@@ -263,7 +275,6 @@ const Chat = () => {
       </header>
 
       <div className="chat-container">
-        {/* Sidebar with hamburger toggle */}
         {sidebarVisible && (
           <div
             className={`chat-sidebar ${sidebarCollapsed ? "collapsed" : ""}`}
@@ -347,7 +358,7 @@ const Chat = () => {
                 </div>
               </div>
             ) : (
-              <div className="messages-list">
+              <div className="messages-list" ref={chatContainerRef}>
                 {messages.map((message, index) => (
                   <div
                     key={index}
@@ -367,25 +378,20 @@ const Chat = () => {
                     <div className="message-content">
                       <div className={`message-header ${message.role}`}>
                         {message.role === "user" ? (
-                          <>
-                            <span
-                              className="message-sender"
-                              style={{
-                                marginLeft: "auto",
-                                fontWeight: "600",
-                                fontSize: "0.85rem",
-                              }}
-                            >
-                              {user?.name}
-                            </span>
-                          </>
+                          <span
+                            className="message-sender"
+                            style={{
+                              marginLeft: "auto",
+                              fontWeight: "600",
+                              fontSize: "0.85rem",
+                            }}
+                          >
+                            {user?.name}
+                          </span>
                         ) : (
-                          <>
-                            <span className="message-sender">YUG-AI</span>
-                          </>
+                          <span className="message-sender">YUG-AI</span>
                         )}
                       </div>
-
                       <div className={`message-bubble ${message.role}`}>
                         {message.role === "assistant" ? (
                           <MarkdownRenderer content={message.content} />
