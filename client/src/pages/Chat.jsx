@@ -1,29 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Button,
-  Spinner,
-  InputGroup,
-} from "react-bootstrap";
-import {
   FaRobot,
-  FaUser,
   FaPaperPlane,
   FaSignOutAlt,
   FaCog,
   FaTrash,
   FaPlus,
-  FaHome,
   FaBrain,
   FaBars,
 } from "react-icons/fa";
+import { BsFillSendFill } from "react-icons/bs";
+
+
 import { useAuth } from "../context/AuthContext";
 import { chatAPI } from "../services/api";
 import MarkdownRenderer from "../components/MarkdownRenderer";
+import "./Chat.css";
 
 const Chat = () => {
   const { user, logout, isAdmin } = useAuth();
@@ -36,19 +29,34 @@ const Chat = () => {
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const [chatHistory, setChatHistory] = useState([]);
   const [notification, setNotification] = useState(null);
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(true);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
-  const chatContainerRef = useRef(null); // NEW
+  const chatContainerRef = useRef(null);
+
+  const isMobile = () => window.innerWidth <= 768;
 
   useEffect(() => {
     loadChatHistory();
     inputRef.current?.focus();
     document.body.classList.add("chat-active");
+
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setSidebarVisible(true);
+      } else {
+        setSidebarVisible(false);
+        setSidebarCollapsed(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
     return () => {
       document.body.classList.remove("chat-active");
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -92,16 +100,13 @@ const Chat = () => {
     navigate("/login");
   };
 
-  const isMobile = () => window.innerWidth <= 768;
-
   const startNewChat = () => {
     setMessages([]);
     setCurrentSessionId(null);
     setIsTyping(false);
     setLoading(false);
-    setSidebarVisible(false);
-    inputRef.current?.focus();
     if (isMobile()) setSidebarVisible(false);
+    inputRef.current?.focus();
   };
 
   const loadChatSession = (session) => {
@@ -109,18 +114,21 @@ const Chat = () => {
     setCurrentSessionId(session._id);
     setIsTyping(false);
     setLoading(false);
-    setSidebarVisible(false);
     if (isMobile()) setSidebarVisible(false);
+  };
+
+  const toggleSidebar = (e) => {
+    e.stopPropagation();
+    if (isMobile()) {
+      setSidebarVisible((prev) => !prev);
+    } else {
+      setSidebarCollapsed((prev) => !prev);
+    }
   };
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
-      if (
-        sidebarVisible &&
-        !e.target.closest(".chat-sidebar") &&
-        !e.target.closest(".nav-btn") &&
-        isMobile()
-      ) {
+      if (isMobile() && sidebarVisible && !e.target.closest(".chat-sidebar") && !e.target.closest(".nav-btn")) {
         setSidebarVisible(false);
       }
     };
@@ -169,8 +177,14 @@ const Chat = () => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    scrollToTop(); // <-- NEW
+    scrollToTop();
     setInput("");
+
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto";
+      inputRef.current.rows = 1;
+    }
+
     setLoading(true);
 
     const aiMessagePlaceholder = {
@@ -214,114 +228,92 @@ const Chat = () => {
     }
   };
 
-  const formatTime = (timestamp) => {
-    return new Date(timestamp).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const handleInputChange = (e) => {
+    setInput(e.target.value);
+    const textarea = e.target;
+    textarea.style.height = "auto";
+    textarea.style.height = Math.min(textarea.scrollHeight, 150) + "px";
   };
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.style.pointerEvents = "auto";
+    }
+  }, []);
 
   return (
     <div className="chat-app">
       {/* Header */}
       <header className="chat-header">
-        <Container fluid>
-          <Row className="align-items-center">
-            <Col>
-              <div className="d-flex align-items-center">
-                <Button
-                  variant="link"
-                  className="nav-btn"
-                  onClick={() => setSidebarVisible(!sidebarVisible)}
-                >
-                  <FaBars />
-                </Button>
-                <Link
-                  to="/dashboard"
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  <div className="header-logo d-flex align-items-center ms-2">
-                    <FaBrain className="logo-pulse me-2" />
-                    <span className="header-title">YUG-AI</span>
-                  </div>
-                </Link>
-              </div>
-            </Col>
-            <Col xs="auto">
-              <div className="header-actions d-flex align-items-center gap-3">
-                <div className="user-status d-flex align-items-center gap-2">
-                  <div className="status-indicator online"></div>
-                  <span className="user-name">{user?.name}</span>
-                </div>
-                {isAdmin() && (
-                  <Button
-                    className="action-btn admin-btn d-flex align-items-center gap-2"
-                    onClick={() => navigate("/admin")}
-                  >
-                    <FaCog />
-                    <span className="d-none d-sm-inline">Admin</span>
-                  </Button>
-                )}
-                <Button
-                  className="action-btn logout-btn"
-                  onClick={handleLogout}
-                >
-                  <FaSignOutAlt />
-                </Button>
-              </div>
-            </Col>
-          </Row>
-        </Container>
+        <div className="header-left">
+          <button className="nav-btn" onClick={toggleSidebar}>
+            <FaBars />
+          </button>
+          <Link to="/dashboard" className="header-logo-link">
+            <div className="header-logo">
+              <FaBrain className="logo-pulse" />
+              <span className="header-title">YUG-AI</span>
+            </div>
+          </Link>
+        </div>
+        <div className="header-right">
+          <div className="user-status">
+            <div className="status-indicator online"></div>
+            <span className="user-name">{user?.name}</span>
+          </div>
+          {isAdmin() && (
+            <button className="action-btn admin-btn" onClick={() => navigate("/admin")}>
+              <FaCog />
+              <span className="admin-btn-text">Admin</span>
+            </button>
+          )}
+          <button className="action-btn logout-btn" onClick={handleLogout}>
+            <FaSignOutAlt />
+          </button>
+        </div>
       </header>
 
       <div className="chat-container">
-        {sidebarVisible && (
-          <div
-            className={`chat-sidebar ${sidebarCollapsed ? "collapsed" : ""}`}
-          >
-            <div className="sidebar-header">
-              <Button className="new-chat-btn w-100" onClick={startNewChat}>
-                <FaPlus />
-                New Chat
-              </Button>
-            </div>
-            <div className="chat-history">
-              <div className="history-title">Recent Chats</div>
-              {chatHistory.length === 0 ? (
-                <div className="empty-history">
-                  <FaRobot className="empty-icon" />
-                  <p>No conversations yet</p>
-                </div>
-              ) : (
-                chatHistory.map((session) => (
-                  <div
-                    key={session._id}
-                    className={`chat-session-item ${currentSessionId === session._id ? "active" : ""
-                      }`}
-                    onClick={() => loadChatSession(session)}
-                  >
-                    <div className="session-title">{session.title}</div>
-                    <div className="session-meta">
-                      <span className="session-time">
-                        {new Date(
-                          session.lastActivity || session.createdAt
-                        ).toLocaleDateString()}
-                      </span>
-                      <Button
-                        variant="link"
-                        size="sm"
-                        className="delete-session"
-                        onClick={(e) => deleteChatSession(session._id, e)}
-                      >
-                        <FaTrash />
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+        <div className={`chat-sidebar ${sidebarCollapsed ? "collapsed" : ""} ${sidebarVisible ? "show" : ""}`}>
+          <div className="sidebar-header">
+            <button className="new-chat-btn" onClick={startNewChat}>
+              <FaPlus />
+              New Chat
+            </button>
           </div>
-        )}
+          <div className="chat-history">
+            <div className="history-title">Recent Chats</div>
+            {chatHistory.length === 0 ? (
+              <div className="empty-history">
+                <FaRobot className="empty-icon" />
+                <p>No conversations yet</p>
+              </div>
+            ) : (
+              chatHistory.map((session) => (
+                <div
+                  key={session._id}
+                  className={`chat-session-item ${currentSessionId === session._id ? "active" : ""}`}
+                  onClick={() => loadChatSession(session)}
+                >
+                  <div className="session-title">{session.title}</div>
+                  <div className="session-meta">
+                    <span className="session-time">
+                      {new Date(
+                        session.lastActivity || session.createdAt
+                      ).toLocaleDateString()}
+                    </span>
+                    <button
+                      className="delete-session"
+                      onClick={(e) => deleteChatSession(session._id, e)}
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
 
         {/* Main Chat */}
         <div className="chat-main">
@@ -333,27 +325,15 @@ const Chat = () => {
                   <h3>Ready to chat?</h3>
                   <p>Start a conversation with our YUG-AI. Ask anything!</p>
                   <div className="suggested-prompts">
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => setInput("What can you help me with?")}
-                    >
+                    <button onClick={() => setInput("What can you help me with?")}>
                       What can you help me with?
-                    </Button>
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => setInput("Tell me a joke")}
-                    >
+                    </button>
+                    <button onClick={() => setInput("Tell me a joke")}>
                       Tell me a joke
-                    </Button>
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => setInput("Explain quantum computing")}
-                    >
+                    </button>
+                    <button onClick={() => setInput("Explain quantum computing")}>
                       Explain quantum computing
-                    </Button>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -377,20 +357,9 @@ const Chat = () => {
                     </div>
                     <div className="message-content">
                       <div className={`message-header ${message.role}`}>
-                        {message.role === "user" ? (
-                          <span
-                            className="message-sender"
-                            style={{
-                              marginLeft: "auto",
-                              fontWeight: "600",
-                              fontSize: "0.85rem",
-                            }}
-                          >
-                            {user?.name}
-                          </span>
-                        ) : (
-                          <span className="message-sender">YUG-AI</span>
-                        )}
+                        <span className="message-sender">
+                          {message.role === "user" ? user?.name : "YUG-AI"}
+                        </span>
                       </div>
                       <div className={`message-bubble ${message.role}`}>
                         {message.role === "assistant" ? (
@@ -412,34 +381,38 @@ const Chat = () => {
 
           {/* Chat Input */}
           <div className="chat-input-container">
-            <Form onSubmit={handleSend} className="chat-form">
-              <InputGroup className="chat-input-group">
-                <Form.Control
+            <form className="chat-form" onSubmit={handleSend}>
+              <div className="chat-input-group">
+                <textarea
                   ref={inputRef}
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your message here..."
+                  onChange={handleInputChange}
+                  placeholder="Ask anything"
                   disabled={loading}
                   className="chat-input"
-                />
-                <Button
+                  rows="1"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend(e);
+                    }
+                  }}
+                ></textarea>
+                <button
                   type="submit"
                   disabled={!input.trim() || loading}
-                  className="send-btn"
+                  className={`send-btn ${loading ? "loading" : ""}`}
+                  onClick={handleSend}
                 >
-                  {loading ? (
-                    <Spinner animation="border" size="sm" />
-                  ) : (
-                    <FaPaperPlane />
-                  )}
-                </Button>
-              </InputGroup>
-            </Form>
-            <div className="input-footer">
-              <span className="input-hint">
-                Press Enter to send, Shift + Enter for new line
-              </span>
-            </div>
+                  <BsFillSendFill />
+                </button>
+              </div>
+              <div className="input-footer">
+                <span className="input-hint">
+                  Press Enter to send, Shift + Enter for new line
+                </span>
+              </div>
+            </form>
           </div>
         </div>
       </div>
