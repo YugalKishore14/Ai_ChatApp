@@ -12,7 +12,6 @@ import {
 } from "react-icons/fa";
 import { BsFillSendFill } from "react-icons/bs";
 
-
 import { useAuth } from "../context/AuthContext";
 import { chatAPI } from "../services/api";
 import MarkdownRenderer from "../components/MarkdownRenderer";
@@ -31,7 +30,7 @@ const Chat = () => {
   const [notification, setNotification] = useState(null);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -53,7 +52,9 @@ const Chat = () => {
       }
     };
 
+    handleResize(); // Set initial state
     window.addEventListener("resize", handleResize);
+
     return () => {
       document.body.classList.remove("chat-active");
       window.removeEventListener("resize", handleResize);
