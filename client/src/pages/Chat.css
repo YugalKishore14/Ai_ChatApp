@@ -440,6 +440,14 @@
         padding: 1rem;
     }
 
+
+    .chat-input-container {
+        padding: 1rem 1rem 1.5rem;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+
     .suggested-prompts button {
         padding: 5px 10px;
         font-size: 0.8rem;
@@ -454,6 +462,7 @@
     .chat-header {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         padding: 0.75rem 1rem;
+        margin-top: auto;
     }
 
     .action-btn:hover,
